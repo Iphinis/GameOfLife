@@ -32,3 +32,9 @@ class Cellule {
     }
 }
 
+/*
+Une cellule vivante avec moins de 2 voisins vivants meurt par sous-population.
+Une cellule vivante avec 2 ou 3 voisins vivants reste vivante.
+Une cellule vivante avec plus de 3 voisins vivants meurt par surpopulation.
+Une cellule morte avec exactement 3 voisins vivants devient vivante par reproduction.
+*/
