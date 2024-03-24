@@ -6,13 +6,7 @@ class Jeu {
     
     static int tour = 0;
     
-    public static void main(String[] args) {
-        int nb_tours = 4;
-        for(int i=0; i < 10; i++) {
-            avancerTour();
-        }
-    }
-    
+    // Méthode statique pour démarrer le jeu
     private static void demarrer() {
         List<int[]> cellulesDepart = new ArrayList<int[]>();
         cellulesDepart.add(new int[]{2,2});
@@ -23,16 +17,26 @@ class Jeu {
         grille = new Grille(10, 10, cellulesDepart);
     }
     
+    // Methode statique pour avancer d'un tour dans le jeu
     private static void avancerTour() {
-        System.out.println("Tour " + tour);
-        tour += 1;
-
-        if(tour == 1) {
+        if(tour == 0) {
             demarrer();
-            grille.afficher(false);
+            System.out.println("Grille de départ");
+            grille.afficher();
         }
         else {
-            grille.afficher(true);
+            grille.evoluerCellules();
+            System.out.println("Tour " + tour);
+            grille.afficher();
+        }
+        tour += 1;
+    }
+
+    // Méthode statique principale du projet
+    public static void main(String[] args) {
+        int nb_tours = 5;
+        for(int i=0; i < nb_tours; i++) {
+            avancerTour();
         }
     }
 }
