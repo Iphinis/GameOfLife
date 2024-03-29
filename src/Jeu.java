@@ -9,12 +9,18 @@ class Jeu {
     // Méthode statique pour démarrer le jeu
     private static void demarrer() {
         List<int[]> cellulesDepart = new ArrayList<int[]>();
-        cellulesDepart.add(new int[]{2,2});
-        cellulesDepart.add(new int[]{2,3});
-        cellulesDepart.add(new int[]{2,4});
 
-        // Initialiser grille et créer cellules de départ
-        grille = new Grille(10, 10, cellulesDepart);
+        cellulesDepart.addAll(Motifs.doubleCarre(1,3));
+        
+        cellulesDepart.addAll(Motifs.barreVerticale(7,2));
+
+        // Pour lever une exception s'il y a un problème de coordonnées en dehors de la grille
+        try {
+            // Initialiser grille et créer cellules de départ
+            grille = new Grille(10, 10, cellulesDepart);
+        } catch (Exception e) {
+            throw e;
+        }
     }
     
     // Methode statique pour avancer d'un tour dans le jeu
@@ -27,7 +33,7 @@ class Jeu {
         else {
             grille.evoluerCellules();
             System.out.println("Tour " + tour);
-            grille.afficher();
+            grille.afficher(true);
         }
         tour += 1;
     }
@@ -35,7 +41,7 @@ class Jeu {
     // Méthode statique principale du projet
     public static void main(String[] args) {
         int nb_tours = 5;
-        for(int i=0; i < nb_tours; i++) {
+        for(int i=0; i <= nb_tours; i++) {
             avancerTour();
         }
     }
