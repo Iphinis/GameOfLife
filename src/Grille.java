@@ -1,10 +1,14 @@
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
+
 
 class Grille {
     int largeur;
     int hauteur;
     
     Cellule[][] cellules;
+    List<Cellule[][]> etatsPrecedents = new ArrayList<>();
     
     // Constructeur
     public Grille(int largeur, int hauteur, List<int[]> cellulesDepart) throws ExceptionInInitializerError {
@@ -65,10 +69,18 @@ class Grille {
             cellules[x-1][y-1].enVie = true;
             cellules[x-1][y-1].prochainEtat = true;
         }
+        
+        sauvegarderEtat();
     }
 
     // Méthode pour faire évoluer les cellules
     public void evoluerCellules() {
+        // Vérifier si la grille est vide
+        if (estGrilleVide()) {
+            System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.");
+            return;
+        }
+
         // Déterminer le prochain état des cellules à l'étape suivante
         for(int i = 0; i < largeur; i++) {
             for (int j = 0; j < hauteur; j++) {
@@ -76,12 +88,30 @@ class Grille {
             }
         }
 
+        // Faire évoluer les cellules
         for(int i = 0; i < largeur; i++) {
             for (int j = 0; j < hauteur; j++) {
                 cellules[i][j].evoluer();
             }
         }
+
+        // Sauvegarder l'état actuel
+        sauvegarderEtat();
     }
+    
+        // Méthode pour vérifier si la grille est vide
+    public boolean estGrilleVide() {
+        for(int i = 0; i < largeur; i++) {
+            for (int j = 0; j < hauteur; j++) {
+                if (cellules[i][j].enVie) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    
 
     // Méthode pour afficher la grille contenant les cellules
     public void afficher() {
@@ -151,5 +181,28 @@ class Grille {
         System.out.println(bordure + "\n");
     }
     
+    // Méthode pour sauvegarder l'état actuel de la grille
+    private void sauvegarderEtat() {
+        Cellule[][] copie = new Cellule[largeur][hauteur];
+        for (int i = 0; i < largeur; i++){
+            copie[i] = cellules[i];
+        }
+        etatsPrecedents.add(copie);
+    }
+    
+    // Méthode pour vérifier si la grille se répète
+    public boolean grilleSeRepete() {
+        // Parcourir les états précédents pour détecter une répétition
+        for (int i = 0; i < etatsPrecedents.size(); i++) {
+            if (Arrays.deepEquals(cellules, etatsPrecedents.get(i))) {
+                // Calculer la périodicité
+                int periode = etatsPrecedents.size() - i;
+                System.out.println("La grille se répète après " + i + " itérations.");
+                System.out.println("Périodicité : " + periode);
+                return true;
+            }
+        }
+        return false;
+    }
     
 }
