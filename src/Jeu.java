@@ -10,16 +10,16 @@ class Jeu {
     private static void demarrer() {
         List<int[]> cellulesDepart = new ArrayList<int[]>();
 
-        cellulesDepart.add(new int[]{1,2});
+        cellulesDepart.add(new int[]{0,7});
         cellulesDepart.add(new int[]{3,2});
 
-        /*cellulesDepart.addAll(Motifs.doubleCarre(1,3));
-        cellulesDepart.addAll(Motifs.barreVerticale(7,2));*/
+        cellulesDepart.addAll(Motifs.doubleCarre(1,3));
+        cellulesDepart.addAll(Motifs.barreVerticale(7,2));
 
         // Pour lever une exception s'il y a un problème de coordonnées en dehors de la grille
         try {
             // Initialiser la grille et créer les cellules de départ
-            grille = new Grille(10, 10, cellulesDepart);
+            grille = new Grille(10, 10, 20, cellulesDepart);
         } catch (Exception e) {
             throw e;
         }
@@ -34,7 +34,7 @@ class Jeu {
         } else {
             grille.evoluerCellules();
             System.out.println("Tour " + tour);
-            grille.afficher(true);
+            grille.afficher();
             
             // Vérifier si la grille est vide
             if (grille.estGrilleVide()) {

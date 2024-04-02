@@ -6,38 +6,31 @@ import java.util.ArrayList;
 class Grille {
     int largeur;
     int hauteur;
+
+    int periodiciteMax;
     
     Cellule[][] cellules;
     List<Cellule[][]> etatsPrecedents = new ArrayList<>();
 
-
-    // Méthode pour sauvegarder l'état actuel de la grille
-    private void sauvegarderEtat() {
-        Cellule[][] copie = new Cellule[largeur][hauteur];
-        for (int i = 0; i < largeur; i++){
-            copie[i] = cellules[i];
-        }
-        etatsPrecedents.add(copie);
-    }
-
     
     // Constructeur
-    public Grille(int largeur, int hauteur, List<int[]> cellulesDepart) throws ExceptionInInitializerError {
-        this.largeur = largeur;
+    public Grille(int hauteur, int largeur, int periodiciteMax, List<int[]> cellulesDepart) throws ExceptionInInitializerError {
         this.hauteur = hauteur;
+        this.largeur = largeur;
+        this.periodiciteMax = periodiciteMax;
 
-        cellules = new Cellule[largeur][hauteur];
+        cellules = new Cellule[hauteur][largeur];
 
         // Initialiser les cellules
-        for (int i = 0; i < largeur; i++) {
-            for (int j = 0; j < hauteur; j++) {
+        for (int i = 0; i < hauteur; i++) {
+            for (int j = 0; j < largeur; j++) {
                 cellules[i][j] = new Cellule();
             }
         }
         
         // Initialiser les voisins des cellules
-        for (int i = 0; i < largeur; i++) {
-            for (int j = 0; j < hauteur; j++) {
+        for (int i = 0; i < hauteur; i++) {
+            for (int j = 0; j < largeur; j++) {
                 // Côtés
                 if (i > 0) {
                     cellules[i][j].voisins.add(cellules[i - 1][j]);
@@ -70,15 +63,15 @@ class Grille {
         // Faire naître les cellules de départ
         int length = cellulesDepart.size();
         for(int i=0; i < length; i++) {
-            int x = cellulesDepart.get(i)[0];
-            int y = cellulesDepart.get(i)[1];
+            int y = cellulesDepart.get(i)[0];
+            int x = cellulesDepart.get(i)[1];
 
-            if(x <= 0 || x > largeur || y <= 0 || y > hauteur) {
+            if(x < 0 || x >= largeur || y < 0 || y >= hauteur) {
                 throw new ExceptionInInitializerError("Coordonnées (" + x + "," + y + ") en dehors de la grille " + largeur + "x" + hauteur);
             }
 
-            cellules[x-1][y-1].enVie = true;
-            cellules[x-1][y-1].prochainEtat = true;
+            cellules[y][x].enVie = true;
+            cellules[y][x].prochainEtat = true;
         }
         
         sauvegarderEtat();
@@ -87,8 +80,8 @@ class Grille {
 
     // Méthode pour vérifier si la grille est vide
     public boolean estGrilleVide() {
-        for(int i = 0; i < largeur; i++) {
-            for (int j = 0; j < hauteur; j++) {
+        for(int i = 0; i < hauteur; i++) {
+            for (int j = 0; j < largeur; j++) {
                 if (cellules[i][j].enVie) {
                     return false;
                 }
@@ -107,15 +100,15 @@ class Grille {
         }
 
         // Déterminer le prochain état des cellules à l'étape suivante
-        for(int i = 0; i < largeur; i++) {
-            for (int j = 0; j < hauteur; j++) {
+        for(int i = 0; i < hauteur; i++) {
+            for (int j = 0; j < largeur; j++) {
                 cellules[i][j].determinerProchainEtat();
             }
         }
 
         // Faire évoluer les cellules
-        for(int i = 0; i < largeur; i++) {
-            for (int j = 0; j < hauteur; j++) {
+        for(int i = 0; i < hauteur; i++) {
+            for (int j = 0; j < largeur; j++) {
                 cellules[i][j].evoluer();
             }
         }
@@ -139,12 +132,11 @@ class Grille {
 
         System.out.println(bordure);
 
-        // Pour respecter la convention (x,y) et l'affichage ligne par ligne on parcourt l'axe y et puis la l'axe x
         for(int i = 0; i < hauteur; i++) {
             res = res.concat("|");
             for (int j = 0; j < largeur; j++) {
                 
-                if(cellules[j][i].enVie) etat = "*";
+                if(cellules[i][j].enVie) etat = "*";
                 else etat = " ";
 
                 res = res.concat(etat);
@@ -177,12 +169,12 @@ class Grille {
             for (int j = 0; j < largeur; j++) {
 
                 if(debug) {
-                    if(cellules[j][i].enVie) etat = "*";
-                else etat = " ";
+                    // Pour debug le nombre de voisins des cellules
+                    etat = Integer.toString(cellules[i][j].voisinsVivants());
                 }
                 else {
-                    // Pour debug le nombre de voisins des cellules
-                    etat = Integer.toString(cellules[j][i].voisinsVivants());
+                    if(cellules[i][j].enVie) etat = "*";
+                    else etat = " ";
                 }
 
                 res = res.concat(etat);
@@ -208,6 +200,20 @@ class Grille {
             }
         }
         return false;
+    }
+
+    // Méthode pour sauvegarder l'état actuel de la grille
+    private void sauvegarderEtat() {
+        Cellule[][] copie = new Cellule[largeur][hauteur];
+        for (int i = 0; i < hauteur; i++){
+            for (int j = 0; j < largeur; j++){
+                copie[i][j] = cellules[i][j];
+            }
+        }
+        if(etatsPrecedents.size() == periodiciteMax) {
+            etatsPrecedents.remove(0);
+        }
+        etatsPrecedents.add(copie);
     }
     
 }
