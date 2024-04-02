@@ -9,6 +9,17 @@ class Grille {
     
     Cellule[][] cellules;
     List<Cellule[][]> etatsPrecedents = new ArrayList<>();
+
+
+    // Méthode pour sauvegarder l'état actuel de la grille
+    private void sauvegarderEtat() {
+        Cellule[][] copie = new Cellule[largeur][hauteur];
+        for (int i = 0; i < largeur; i++){
+            copie[i] = cellules[i];
+        }
+        etatsPrecedents.add(copie);
+    }
+
     
     // Constructeur
     public Grille(int largeur, int hauteur, List<int[]> cellulesDepart) throws ExceptionInInitializerError {
@@ -73,6 +84,20 @@ class Grille {
         sauvegarderEtat();
     }
 
+
+    // Méthode pour vérifier si la grille est vide
+    public boolean estGrilleVide() {
+        for(int i = 0; i < largeur; i++) {
+            for (int j = 0; j < hauteur; j++) {
+                if (cellules[i][j].enVie) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
     // Méthode pour faire évoluer les cellules
     public void evoluerCellules() {
         // Vérifier si la grille est vide
@@ -98,19 +123,6 @@ class Grille {
         // Sauvegarder l'état actuel
         sauvegarderEtat();
     }
-    
-        // Méthode pour vérifier si la grille est vide
-    public boolean estGrilleVide() {
-        for(int i = 0; i < largeur; i++) {
-            for (int j = 0; j < hauteur; j++) {
-                if (cellules[i][j].enVie) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
     
 
     // Méthode pour afficher la grille contenant les cellules
@@ -143,6 +155,7 @@ class Grille {
 
         System.out.println(bordure + "\n");
     }
+
 
     // Méthode pour afficher la grille contenant les cellules
     public void afficher(boolean debug) {
@@ -180,15 +193,7 @@ class Grille {
 
         System.out.println(bordure + "\n");
     }
-    
-    // Méthode pour sauvegarder l'état actuel de la grille
-    private void sauvegarderEtat() {
-        Cellule[][] copie = new Cellule[largeur][hauteur];
-        for (int i = 0; i < largeur; i++){
-            copie[i] = cellules[i];
-        }
-        etatsPrecedents.add(copie);
-    }
+
     
     // Méthode pour vérifier si la grille se répète
     public boolean grilleSeRepete() {
