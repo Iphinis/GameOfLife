@@ -6,12 +6,12 @@ class Jeu {
     
     static int tour = 0;
     
-    // Méthode statique pour démarrer le jeu
-    private static void demarrer() {
+     // Méthode statique pour démarrer le jeu
+    private static void initialiserGrille() {
         List<int[]> cellulesDepart = new ArrayList<int[]>();
 
-        cellulesDepart.add(new int[]{0,7});
-        cellulesDepart.add(new int[]{3,2});
+        //cellulesDepart.add(new int[]{0,7});
+        //cellulesDepart.add(new int[]{3,2});
 
         cellulesDepart.addAll(Motifs.doubleCarre(1,3));
         cellulesDepart.addAll(Motifs.barreVerticale(7,2));
@@ -28,7 +28,7 @@ class Jeu {
     // Methode statique pour avancer d'un tour dans le jeu
 	private static boolean avancerTour() {
         if (tour == 0) {
-            demarrer();
+            initialiserGrille();
             System.out.println("Grille de départ");
             grille.afficher();
         } else {
@@ -36,7 +36,7 @@ class Jeu {
             System.out.println("Tour " + tour);
             grille.afficher();
             
-            // Vérifier si la grille est vide
+            // Vérifier si la grille efile while parsingst vide
             if (grille.estGrilleVide()) {
                 System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.");
                 return false;
@@ -57,6 +57,8 @@ class Jeu {
     public static void main(String[] args) {
         // Le jeu s'arrête lorsqu'une répétition est détectée ou que la grille est vide
         while(avancerTour());
+        //grille.sauvegarderGrille("nouvelle_grille.txt");
+        
     }
 }
 

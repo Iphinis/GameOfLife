@@ -1,18 +1,20 @@
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 
 class Grille {
     int largeur;
     int hauteur;
-
     int periodiciteMax;
-    
     Cellule[][] cellules;
     List<Cellule[][]> etatsPrecedents = new ArrayList<>();
 
-    
     // Constructeur
     public Grille(int hauteur, int largeur, int periodiciteMax, List<int[]> cellulesDepart) throws ExceptionInInitializerError {
         this.hauteur = hauteur;
@@ -216,4 +218,64 @@ class Grille {
         etatsPrecedents.add(copie);
     }
     
+	public void sauvegarderGrille(String nomFichier) {
+    try {
+        // Création d'un FileWriter pour écrire dans le fichier spécifié
+        FileWriter fileWriter = new FileWriter(nomFichier, false);
+
+        // Création d'un BufferedWriter qui utilise le FileWriter
+        BufferedWriter writer = new BufferedWriter(fileWriter);
+
+        // Sauvegarde de la grille dans le fichier
+        writer.write(this.hauteur);
+        writer.write(this.largeur);
+        for (int i = 0; i < hauteur; i++) {
+            for (int j = 0; j < largeur; j++) {
+                if (cellules[i][j].enVie) writer.write("O");
+                else writer.write("_");
+            }
+            writer.newLine();
+        }
+        // Fermeture du BufferedWriter
+        writer.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+	}
+	
+	public void chargerGrille(String nomFichier) {
+    try {
+        // Création d'un FileReader pour lire à partir du fichier spécifié
+        FileReader fileReader = new FileReader(nomFichier);
+
+        // Création d'un BufferedReader qui utilise le FileReader
+        BufferedReader reader = new BufferedReader(fileReader);
+
+        // Lecture de la hauteur et de la largeur depuis le fichier
+        this.hauteur = Integer.parseInt(reader.readLine());
+        this.largeur = Integer.parseInt(reader.readLine());
+        
+        // Initialisation de la grille avec les dimensions lues
+        this.cellules = new Cellule[this.hauteur][this.largeur];
+
+        // Lecture de la grille depuis le fichier
+        for (int i = 0; i < hauteur; i++) {
+            String ligne = reader.readLine();
+            for (int j = 0; j < largeur; j++) {
+                // Initialisation des cellules en fonction des caractères lus
+                this.cellules[i][j] = new Cellule();
+                if (ligne.charAt(j) == 'O') {
+                    this.cellules[i][j].enVie = true;
+                } else {
+                    this.cellules[i][j].enVie = false;
+                }
+            }
+        }
+
+        // Fermeture du BufferedReader
+        reader.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    }
 }
