@@ -2,40 +2,140 @@ import java.util.List;
 import java.util.ArrayList;
 
 class Cellule {
-    public boolean enVie = false;
-    public boolean prochainEtat = false;
 
-    public List<Cellule> voisins = new ArrayList<Cellule>();
+	private boolean enVie;
+	private boolean prochainEtat;
+	private List<Cellule> voisins;
 
-    // Fonction qui renvoie le nombre de voisins vivants de la cellule
-    public int voisinsVivants() {
-        int s = 0;
-        int n = voisins.size();
-        for (int i = 0; i < n; i++) {
-            if (voisins.get(i).enVie) s += 1;
+	public Cellule(){
+		this.enVie = false;
+		this.prochainEtat = false; 
+		this.voisins = new ArrayList<Cellule>();
+	}
+	
+	public boolean getEnVie() {
+		return enVie;
+	}
+
+	public void setEnVie(boolean enVie) {
+		this.enVie = enVie;
+	}
+
+	public boolean getProchainEtat() {
+    		return prochainEtat;
+	}
+
+	public void setProchainEtat(boolean prochainEtat) {
+    		this.prochainEtat = prochainEtat;
+	}
+	
+	public void addVoisin(Cellule voisin) {
+		this.voisins.add(voisin);
+	}
+	
+	public void removeVoisin(Cellule voisin) {
+		this.voisins.remove(voisin);
+
+	}
+	
+	// Renvoie le nombre de voisins vivants
+	public int voisinsVivants() {
+        	int s = 0;
+        	int n = voisins.size();
+        	for (int i = 0; i < n; i++) {
+            		if (voisins.get(i).enVie) s += 1;
+        	}
+        	return s;
         }
-        return s;
-    }
+	
+	public void evoluer() {
+        	enVie = prochainEtat;
+    	}
+    	
+	public void determinerProchainEtatClassique() {
+       		int voisinsVivants = voisinsVivants();
+        	if (enVie) {
+        		if (voisinsVivants < 2 || voisinsVivants > 3) {
+                		prochainEtat = false; // Mort par solitude ou surpopulation
+            		} else {
+                		prochainEtat = true; // Survie
+            		}
+        	} else {
+            		if (voisinsVivants == 3) {
+                		prochainEtat = true; // Naissance
+            		}
+        	}
+    	}
+    	
+    	public void determinerProchainEtatHighlife() {
+    		int voisinsVivants = voisinsVivants();
+    		if (enVie) {
+        		if (voisinsVivants < 2 || voisinsVivants > 3) {
+            			prochainEtat = false; // Mort par solitude ou surpopulation
+        		} else {
+            			prochainEtat = true; // Survie
+        		}
+    		} else {
+       			 if (voisinsVivants == 3 || voisinsVivants == 6) {
+           			 prochainEtat = true; // Naissance
+        		}
+    		}
+	}
 
-    // Fonction qui détermine le prochain état de la cellule
-    public void determinerProchainEtat() {
-        int v = voisinsVivants();
+	public void determinerProchainEtatReplicator() {
+	    int voisinsVivants = voisinsVivants();
+	    if (enVie) {
+		if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 7) {
+		    prochainEtat = true; // Survie
+		} else {
+		    prochainEtat = false; // Mort
+		}
+	    } else {
+		if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 7) {
+		    prochainEtat = true; // Naissance
+		}
+	    }
+	}
 
-        if (enVie) {
-            // Règles pour une cellule vivante
-            if (v < 2 || v > 3) {
-                prochainEtat = false; // Mort par sous-population ou surpopulation
-            }
-        } else {
-            // Règles pour une cellule morte
-            if (v == 3) {
-                prochainEtat = true; // Naissance
-            }
-        }
-    }
+	public void determinerProchainEtatDayAndNight() {
+	    int voisinsVivants = voisinsVivants();
+	    if (enVie) {
+		if (voisinsVivants == 3 || voisinsVivants == 4 || voisinsVivants == 6 || voisinsVivants == 7) {
+		    prochainEtat = true; // Survie
+		} else {
+		    prochainEtat = false; // Mort
+		}
+	    } else {
+		if (voisinsVivants == 3 || voisinsVivants == 6 || voisinsVivants == 7 || voisinsVivants == 8) {
+		    prochainEtat = true; // Naissance
+		}
+	    }
+	}
 
-    // Fonction qui fait évoluer la cellule vers son prochain état
-    public void evoluer() {
-        enVie = prochainEtat;
-    }
+	public void determinerProchainEtatLifeWithoutDeath() {
+	    int voisinsVivants = voisinsVivants();
+	    if (voisinsVivants == 3 || enVie) {
+		prochainEtat = true;
+	    } else {
+		prochainEtat = false;
+	    }
+	}
+
+	public void determinerProchainEtatAmoeba() {
+	    int voisinsVivants = voisinsVivants();
+	    if (enVie) {
+		if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 8 || voisinsVivants == 9) {
+		    prochainEtat = true; // Survie
+		} else {
+		    prochainEtat = false; // Mort
+		}
+	    } else {
+		if (voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 6 || voisinsVivants == 7 || voisinsVivants == 8) {
+		    prochainEtat = true; // Naissance
+		}
+	    }
+	}
+
+	
+
 }

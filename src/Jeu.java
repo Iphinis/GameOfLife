@@ -32,7 +32,7 @@ class Jeu {
             System.out.println("Grille de départ");
             grille.afficher();
         } else {
-            grille.evoluerCellules();
+            grille.evoluerGrille();
             System.out.println("Tour " + tour);
             grille.afficher();
             
@@ -58,7 +58,6 @@ class Jeu {
         // Le jeu s'arrête lorsqu'une répétition est détectée ou que la grille est vide
         while(avancerTour());
         //grille.sauvegarderGrille("nouvelle_grille.txt");
-        
     }
 }
 
