@@ -10,7 +10,7 @@ class Jeu {
     static int tour = 0;
     static int methodeEvolution = 1;
     static List<Motif> motifs;
-    public enum ModeJeu {
+    static enum ModeJeu {
         CLASSIQUE,
         HIGHLIFE,
         REPLICATOR,
@@ -18,8 +18,7 @@ class Jeu {
         LIFE_WITHOUT_DEATH,
         AMOEBA
     }
-    ModeJeu[] modes = ModeJeu.values();
-    ModeJeu mode = modes[i];
+    static ModeJeu[] modes = ModeJeu.values();
 
     private static void initialiserGrille() {
         // Initialiser les motifs
@@ -34,13 +33,13 @@ class Jeu {
         grille = new Grille(lignes, colonnes, Motifs.getPeriodiciteMax());
 
         // Exemple d'insertion de motif (exemple à ne pas garder ici)
-        grille.insererMotif(motifs.get(0),new int[]{3,3});
+        //grille.insererMotif(motifs.get(0),new int[]{3,3});
 
         // Pour charger depuis un fichier
         //grille.chargerGrille("data/grilles/grille.txt");
     }
 
-	public void insererCellules() {
+	private static void insererCellules() {
 		Scanner scanner = new Scanner(System.in);
 		int nb, k, x, y;
 
@@ -50,20 +49,20 @@ class Jeu {
 
 		for (k = 0; k < nb; k++) {
 			do {
-				System.out.print("Saisir x entre 0 et " + (this.colonnes - 1) + " : ");
+				System.out.print("Saisir x entre 0 et " + (colonnes - 1) + " : ");
 				x = scanner.nextInt();
 				scanner.nextLine();
-				System.out.print("Saisir y entre 0 et " + (this.lignes - 1) + " : ");
+				System.out.print("Saisir y entre 0 et " + (lignes - 1) + " : ");
 				y = scanner.nextInt();
 				scanner.nextLine();
-			} while (grille.grille.estDansGrille(x,y));
-		grille.grille.naitreCellule(x,y);
+			} while (grille.estDansGrille(x,y));
+		grille.naitreCellule(x,y);
 		grille.afficher();
 		scanner.close();
 		}
 	}
 	
-	public void retirerCellules() {
+	private static void retirerCellules() {
 		Scanner scanner = new Scanner(System.in);
 		int nb, k, x, y;
 
@@ -73,21 +72,21 @@ class Jeu {
 
 		for (k = 0; k < nb; k++) {
 			do {
-				System.out.print("Saisir x entre 0 et " + (this.colonnes - 1) + " : ");
+				System.out.print("Saisir x entre 0 et " + (colonnes - 1) + " : ");
 				x = scanner.nextInt();
 				scanner.nextLine();
-				System.out.print("Saisir y entre 0 et " + (this.lignes - 1) + " : ");
+				System.out.print("Saisir y entre 0 et " + (lignes - 1) + " : ");
 				y = scanner.nextInt();
 				scanner.nextLine();
-			} while (grille.grille.estDansGrille(x,y));
-		grille.grille.tuerCellule(x,y);
+			} while (grille.estDansGrille(x,y));
+		grille.tuerCellule(x,y);
 		grille.afficher();
 		scanner.close();
 		}
 	}
 	
 
-	public void changerModeJeu() {
+	private static void changerModeJeu() {
 	Scanner scanner = new Scanner(System.in);
 	int choix;
 
@@ -104,21 +103,21 @@ class Jeu {
 		choix = scanner.nextInt();
 		scanner.nextLine(); // Consommer le retour à la ligne
 	} while (choix < 1 || choix > 6); // Répéter tant que le choix n'est pas valide
-	this.methodeEvolution = choix;
+	methodeEvolution = choix;
 	scanner.close();
 	}
 
     private static void menuTour() {
     	int nb;
     	int x, y, k;
-    	int choix
+    	int choix;
     	do{
 	    grille.afficher();
 	    System.out.println("1. Réinitialiser la grille");
 	    System.out.println("2. Insérer cellule(s)");
 	    System.out.println("3. Retirer cellule(s)");
 	    System.out.println("4. Avancer de n tours");
-	    System.out.println("5. Changer le mode de jeu : actuel = " + mode[methodeEvolution-1]);
+	    System.out.println("5. Changer le mode de jeu : actuel = " + modes[methodeEvolution-1]);
 	    System.out.println("6. Sauvegarder la grille");
 	    System.out.println("7. Quitter");
 	    System.out.print("Choix : ");
@@ -146,7 +145,7 @@ class Jeu {
 		    changerModeJeu();
 		    break;
 		case 6:
-		    grille.grille.sauvegarderGrille("data/grille/nouvelle_grille.txt");
+		    grille.sauvegarderGrille("data/grille/nouvelle_grille.txt");
 		    break;
 		case 7:
 		    System.out.println("Au revoir !");
@@ -157,7 +156,6 @@ class Jeu {
 		    break;
 	    }
 	}while(choix!=7);
-	scanner.close();
 	}
 
         
@@ -222,13 +220,11 @@ class Jeu {
 			if (repertoire.isDirectory()) {
 				File[] fichiers = repertoire.listFiles();
 				if (fichiers != null && fichiers.length > 0) {
-					nomFichier = menuChoixFichier;
+					nomFichier = menuChoixFichier(fichiers);
 					grille.chargerGrille(nomFichier);
 					System.out.println("Grille chargee");
 					grilleInit = true;
-					}
-					
-				} else {
+					} else {
 					System.out.println("Le répertoire est vide.");
 				}
 			} else {
@@ -244,11 +240,11 @@ class Jeu {
 	    }
 
 	} while((choix !=3) && (grilleInit==false));
-	
-	scanner close();
+	scanner.close();
 	}
 	
 	private static String menuChoixFichier(File[] fichiers) {
+	boolean fichierValide;
         Scanner scanner = new Scanner(System.in);
         String nomFichier;
 
@@ -256,8 +252,6 @@ class Jeu {
         for (File fichier : fichiers) {
             System.out.println(fichier.getName());
         }
-
-        boolean fichierValide;
         do {
             System.out.println("Veuillez choisir le nom du fichier à charger : ");
             nomFichier = scanner.nextLine();
@@ -275,6 +269,7 @@ class Jeu {
             }
         } while (!fichierValide);
         scanner.close();
+        return nomFichier;
     }
     
     public static void main(String[] args) {

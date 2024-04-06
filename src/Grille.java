@@ -12,7 +12,7 @@ class Grille {
     private int colonnes;
     private int lignes;
     private int periodiciteMax;
-    private Cellule[][] grille;
+    public Cellule[][] grille;
     private List<Cellule[][]> etatsPrecedents;
 
     public Grille(int lignes, int colonnes, int periodiciteMax) {
@@ -24,7 +24,7 @@ class Grille {
         initialiserGrille();
     }
 
-    private boolean estDansGrille(int c, int l) {
+    public boolean estDansGrille(int c, int l) {
         return !(l < 0 || l >= lignes || c < 0 || c >= colonnes);
     }
 
@@ -258,7 +258,7 @@ class Grille {
                 System.out.println("La grille se répète après " + (i + 1) + " itération(s).");
                 System.out.println("Périodicité : " + periode);
                 return true;
-            }for (i = 0; i < etatsPrecedents.size(); i++) 
+            }
         }
         return false;
     }
