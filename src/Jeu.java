@@ -107,56 +107,67 @@ class Jeu {
 	scanner.close();
 	}
 
-    private static void menuTour() {
-    	int nb;
-    	int x, y, k;
-    	int choix;
-    	do{
-	    grille.afficher();
-	    System.out.println("1. Réinitialiser la grille");
-	    System.out.println("2. Insérer cellule(s)");
-	    System.out.println("3. Retirer cellule(s)");
-	    System.out.println("4. Avancer de n tours");
-	    System.out.println("5. Changer le mode de jeu : actuel = " + modes[methodeEvolution-1]);
-	    System.out.println("6. Sauvegarder la grille");
-	    System.out.println("7. Quitter");
-	    System.out.print("Choix : ");
-	    
-	    Scanner scanner = new Scanner(System.in);
-	    choix = scanner.nextInt();
-	    scanner.nextLine(); // Pour consommer le retour à la ligne
 
-	    switch (choix) {
-		case 1:
-		    initialiserGrille();
-		    break;
-		case 2:
-		    insererCellules();
-		    break;
-		case 3:
-		    retirerCellules();
-		    break;
-		case 4:
-		    nb = scanner.nextInt();
-		    scanner.nextLine();
-		    avancerTour(nb);
-		    break;
-		case 5:
-		    changerModeJeu();
-		    break;
-		case 6:
-		    grille.sauvegarderGrille("data/grille/nouvelle_grille.txt");
-		    break;
-		case 7:
-		    System.out.println("Au revoir !");
-		    System.exit(0);
-		    break;
-		default:
-		    System.out.println("Choix invalide. Veuillez choisir une option valide.");
-		    break;
-	    }
-	}while(choix!=7);
-	}
+	private static void menuTour() {
+	int choix;
+	do {
+		grille.afficher();
+		System.out.println("1. Réinitialiser la grille");
+		System.out.println("2. Insérer cellule(s)");
+		System.out.println("3. Retirer cellule(s)");
+		System.out.println("4. Avancer de n tours");
+		System.out.println("5. Changer le mode de jeu : actuel = " + modes[methodeEvolution - 1]);
+		System.out.println("6. Sauvegarder la grille");
+		System.out.println("7. Quitter");
+		System.out.print("Choix : ");
+
+		Scanner scanner = new Scanner(System.in);
+		choix = scanner.nextInt();
+		if (scanner.hasNextInt()) { // Check if next token is an integer
+			choix = 0;
+			choix = scanner.nextInt();
+			switch (choix) {
+				case 1:
+					initialiserGrille();
+					break;
+				case 2:
+					insererCellules();
+					break;
+				case 3:
+					retirerCellules();
+					break;
+				case 4:
+					System.out.print("Entrez le nombre de tours à avancer : ");
+					int nbTours;
+					if (scanner.hasNextInt()) {
+						nbTours = scanner.nextInt();
+						avancerTour(nbTours);
+					} else {
+						System.out.println("Nombre de tours invalide.");
+						scanner.nextLine(); // Consume the invalid input
+					}
+					break;
+				case 5:
+					changerModeJeu();
+					break;
+				case 6:
+					grille.sauvegarderGrille("data/grille/nouvelle_grille.txt");
+					break;
+				case 7:
+					System.out.println("Au revoir !");
+					System.exit(0);
+					break;
+				default:
+					System.out.println("Choix invalide. Veuillez choisir une option valide.");
+					break;
+			}
+		} else {
+			System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+		}
+		scanner.close(); // Close the scanner
+	} while (choix != 7);
+}
+
 
         
      // Methode statique pour avancer d'un tour dans le jeu
