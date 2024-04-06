@@ -146,5 +146,22 @@ class Cellule {
 			}
 		}
 	}
+	
+	public boolean equals(Object o) {
+		if (o == null || o.getClass() != this.getClass()) {
+			return false;
+		}
+	
+		Cellule cellule = (Cellule) o;
+		return cellule.getEnVie()==this.getEnVie();
+	}
+	
+	public int hashCode() {
+		if (getEnVie()) {
+    			return 5;
+		} else {
+    			return 3;
+		}
+	}
 
 }

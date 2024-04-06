@@ -24,12 +24,12 @@ class Grille {
         initialiserGrille();
     }
 
-    private boolean estDansGrille(int l, int c) {
-        return !(l < 0 || l >= colonnes || c < 0 || c >= lignes);
+    private boolean estDansGrille(int c, int l) {
+        return !(l < 0 || l >= lignes || c < 0 || c >= colonnes);
     }
 
-    public void naitreCellule(int l, int c) throws IllegalArgumentException {
-        if (!estDansGrille(l, c)) {
+    public void naitreCellule(int c, int l) throws IllegalArgumentException {
+        if (!estDansGrille(c, l)) {
             throw new IllegalArgumentException("Coordonnées en dehors des limites de la grille.");
         } else {
             grille[l][c].setEnVie(true);
@@ -248,15 +248,17 @@ class Grille {
 
     // Méthode pour vérifier si la grille se répète
     public boolean grilleSeRepete() {
+    	int i;
+    	int periode;
         // Parcourir les états précédents pour détecter une répétition
-        for (int i = 0; i < etatsPrecedents.size(); i++) {
-            if (Arrays.deepEquals(grille, etatsPrecedents.get(i))) {
+        for (i = 0; i < etatsPrecedents.size(); i++) {
+            if (equalsGrille(etatsPrecedents.get(i))) {
                 // Calculer la périodicité
-                int periode = etatsPrecedents.size() - i + 1;
+                periode = etatsPrecedents.size() - i + 1;
                 System.out.println("La grille se répète après " + (i + 1) + " itération(s).");
                 System.out.println("Périodicité : " + periode);
                 return true;
-            }
+            }for (i = 0; i < etatsPrecedents.size(); i++) 
         }
         return false;
     }
@@ -384,4 +386,16 @@ class Grille {
         }
         return motifsDetectes;
     }
+    
+    	public boolean equalsGrille(Cellule[][] grille1) {
+		for (int i = 0; i < this.lignes; i++) {
+            		for (int j = 0; j < this.colonnes; j++) {
+            			if (!this.grille[i][j].equals(grille1[i][j])) {
+    					return false;
+				}
+            		}
+            	}
+            	return true;
+	}
+	
 }

@@ -1,15 +1,25 @@
 import java.util.HashMap;
 import java.util.List;
+import java.io.File;
+import java.util.Scanner;
 
 class Jeu {
     static Grille grille;
     static int lignes = 10;
     static int colonnes = 20;
-
     static int tour = 0;
-    static int methodeEvolution = 0;
-
+    static int methodeEvolution = 1;
     static List<Motif> motifs;
+    public enum ModeJeu {
+        CLASSIQUE,
+        HIGHLIFE,
+        REPLICATOR,
+        DAY_AND_NIGHT,
+        LIFE_WITHOUT_DEATH,
+        AMOEBA
+    }
+    ModeJeu[] modes = ModeJeu.values();
+    ModeJeu mode = modes[i];
 
     private static void initialiserGrille() {
         // Initialiser les motifs
@@ -30,43 +40,247 @@ class Jeu {
         //grille.chargerGrille("data/grilles/grille.txt");
     }
 
-    // Methode statique pour avancer d'un tour dans le jeu
-    private static boolean avancerTour() {
-        System.out.println("Tour " + tour);
-        if(tour != 0) grille.evoluerGrille(methodeEvolution);
-        else initialiserGrille();
+	public void insererCellules() {
+		Scanner scanner = new Scanner(System.in);
+		int nb, k, x, y;
 
-        grille.afficher();
+		System.out.print("Combien de cellules vivantes insérer ? ");
+		nb = scanner.nextInt();
+		scanner.nextLine();
 
-        HashMap<String, Integer> motifsDetectes = grille.detecterMotifs(tour);
-        if(!motifsDetectes.isEmpty()) System.out.println("Motifs détectés :");
-        for (String name : motifsDetectes.keySet()) {
-            String value = motifsDetectes.get(name).toString();
-            System.out.println(name + " " + value);
+		for (k = 0; k < nb; k++) {
+			do {
+				System.out.print("Saisir x entre 0 et " + (this.colonnes - 1) + " : ");
+				x = scanner.nextInt();
+				scanner.nextLine();
+				System.out.print("Saisir y entre 0 et " + (this.lignes - 1) + " : ");
+				y = scanner.nextInt();
+				scanner.nextLine();
+			} while (grille.grille.estDansGrille(x,y));
+		grille.grille.naitreCellule(x,y);
+		grille.afficher();
+		scanner.close();
+		}
+	}
+	
+	public void retirerCellules() {
+		Scanner scanner = new Scanner(System.in);
+		int nb, k, x, y;
+
+		System.out.print("Combien de cellules mortes insérer ? ");
+		nb = scanner.nextInt();
+		scanner.nextLine();
+
+		for (k = 0; k < nb; k++) {
+			do {
+				System.out.print("Saisir x entre 0 et " + (this.colonnes - 1) + " : ");
+				x = scanner.nextInt();
+				scanner.nextLine();
+				System.out.print("Saisir y entre 0 et " + (this.lignes - 1) + " : ");
+				y = scanner.nextInt();
+				scanner.nextLine();
+			} while (grille.grille.estDansGrille(x,y));
+		grille.grille.tuerCellule(x,y);
+		grille.afficher();
+		scanner.close();
+		}
+	}
+	
+
+	public void changerModeJeu() {
+	Scanner scanner = new Scanner(System.in);
+	int choix;
+
+		System.out.println("Modes de jeu disponibles :");
+		System.out.println("1. Classique");
+		System.out.println("2. Highlife");
+		System.out.println("3. Replicator");
+		System.out.println("4. Day and Night");
+		System.out.println("5. Life Without Death");
+		System.out.println("6. Amoeba");
+
+		do {
+		System.out.print("Veuillez choisir un mode de jeu : ");
+		choix = scanner.nextInt();
+		scanner.nextLine(); // Consommer le retour à la ligne
+	} while (choix < 1 || choix > 6); // Répéter tant que le choix n'est pas valide
+	this.methodeEvolution = choix;
+	scanner.close();
+	}
+
+    private static void menuTour() {
+    	int nb;
+    	int x, y, k;
+    	int choix
+    	do{
+	    grille.afficher();
+	    System.out.println("1. Réinitialiser la grille");
+	    System.out.println("2. Insérer cellule(s)");
+	    System.out.println("3. Retirer cellule(s)");
+	    System.out.println("4. Avancer de n tours");
+	    System.out.println("5. Changer le mode de jeu : actuel = " + mode[methodeEvolution-1]);
+	    System.out.println("6. Sauvegarder la grille");
+	    System.out.println("7. Quitter");
+	    System.out.print("Choix : ");
+	    
+	    Scanner scanner = new Scanner(System.in);
+	    choix = scanner.nextInt();
+	    scanner.nextLine(); // Pour consommer le retour à la ligne
+
+	    switch (choix) {
+		case 1:
+		    initialiserGrille();
+		    break;
+		case 2:
+		    insererCellules();
+		    break;
+		case 3:
+		    retirerCellules();
+		    break;
+		case 4:
+		    nb = scanner.nextInt();
+		    scanner.nextLine();
+		    avancerTour(nb);
+		    break;
+		case 5:
+		    changerModeJeu();
+		    break;
+		case 6:
+		    grille.grille.sauvegarderGrille("data/grille/nouvelle_grille.txt");
+		    break;
+		case 7:
+		    System.out.println("Au revoir !");
+		    System.exit(0);
+		    break;
+		default:
+		    System.out.println("Choix invalide. Veuillez choisir une option valide.");
+		    break;
+	    }
+	}while(choix!=7);
+	scanner.close();
+	}
+
+        
+     // Methode statique pour avancer d'un tour dans le jeu
+    private static void avancerTour(int n) {
+    	int tour=0;
+    	boolean valide=true;
+    	
+    	while((valide) && (tour<n)){
+		System.out.println("Tour " + tour);
+		grille.evoluerGrille(methodeEvolution);
+
+		grille.afficher();
+
+		HashMap<String, Integer> motifsDetectes = grille.detecterMotifs(tour);
+		if(!motifsDetectes.isEmpty()) System.out.println("Motifs détectés :");
+		for (String name : motifsDetectes.keySet()) {
+		    String value = motifsDetectes.get(name).toString();
+		    System.out.println(name + " " + value);
+		}
+
+		// Vérifier si la grille est vide
+		if (grille.estGrilleVide()) {
+		    System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.\n");
+		    valide = false;
+		}
+
+		// Vérifier si la grille se répète
+		if (grille.grilleSeRepete()) {
+		    System.out.println("Le jeu s'arrête car la grille se répète.\n");
+		    valide = false;
+		}
+
+		tour += 1;
+		System.out.println();
         }
-
-        // Vérifier si la grille est vide
-        if (grille.estGrilleVide()) {
-            System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.\n");
-            return false;
-        }
-
-        // Vérifier si la grille se répète
-        if (grille.grilleSeRepete()) {
-            System.out.println("Le jeu s'arrête car la grille se répète.\n");
-            return false;
-        }
-
-        tour += 1;
-        System.out.println();
-        return true;
     }
+    
+    
+        private static void menuInitGrille() {
+    	int choix;
+    	boolean grilleInit=false;
+    	File repertoire = new File("/data/grilles");
+    	Scanner scanner = new Scanner(System.in);
+    	String nomFichier;
+    	
+    	do {
+            System.out.println("GOF BY SAAD X ROJAN:");
+            System.out.println("1. Nouvelle partie");
+            System.out.println("2. Charger une partie");
+            System.out.println("3. Quitter");
+                       
+            choix = scanner.nextInt();
+            scanner.nextLine(); 
 
-    // Méthode statique principale du projet
+            switch (choix) {
+		case 1:
+			initialiserGrille();
+			grilleInit=true;
+			break;
+		case 2:
+			if (repertoire.isDirectory()) {
+				File[] fichiers = repertoire.listFiles();
+				if (fichiers != null && fichiers.length > 0) {
+					nomFichier = menuChoixFichier;
+					grille.chargerGrille(nomFichier);
+					System.out.println("Grille chargee");
+					grilleInit = true;
+					}
+					
+				} else {
+					System.out.println("Le répertoire est vide.");
+				}
+			} else {
+				System.out.println("Le chemin spécifié ne pointe pas vers un répertoire.");
+			}
+			break;
+		case 3:
+			System.out.println("Au revoir !");
+			break;
+		default:
+			System.out.println("Choix invalide. Veuillez choisir une option valide.");
+			break;
+	    }
+
+	} while((choix !=3) && (grilleInit==false));
+	
+	scanner close();
+	}
+	
+	private static String menuChoixFichier(File[] fichiers) {
+        Scanner scanner = new Scanner(System.in);
+        String nomFichier;
+
+        System.out.println("Liste des fichiers dans le répertoire :");
+        for (File fichier : fichiers) {
+            System.out.println(fichier.getName());
+        }
+
+        boolean fichierValide;
+        do {
+            System.out.println("Veuillez choisir le nom du fichier à charger : ");
+            nomFichier = scanner.nextLine();
+            fichierValide = false;
+
+            for (File fichier : fichiers) {
+                if (fichier.getName().equals(nomFichier)) {
+                    fichierValide = true;
+                    break;
+                }
+            }
+
+            if (!fichierValide) {
+                System.out.println("Nom de fichier invalide. Veuillez choisir un fichier valide.");
+            }
+        } while (!fichierValide);
+        scanner.close();
+    }
+    
     public static void main(String[] args) {
-        // Le jeu s'arrête lorsqu'une répétition est détectée ou que la grille est vide
-        while(avancerTour());
-
-        //grille.sauvegarderGrille("data/grilles/nouvelle_grille.txt");
+        Scanner scanner = new Scanner(System.in);
+        menuInitGrille();
+        menuTour();
+        scanner.close();
     }
 }
