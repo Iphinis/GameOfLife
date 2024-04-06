@@ -1,63 +1,72 @@
+import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 
 class Jeu {
     static Grille grille;
-    
+    static int lignes = 10;
+    static int colonnes = 20;
+
     static int tour = 0;
-    
-     // Méthode statique pour démarrer le jeu
+    static int methodeEvolution = 0;
+
+    static List<Motif> motifs;
+
     private static void initialiserGrille() {
-        List<int[]> cellulesDepart = new ArrayList<int[]>();
-
-        //cellulesDepart.add(new int[]{0,7});
-        //cellulesDepart.add(new int[]{3,2});
-
-        cellulesDepart.addAll(Motifs.doubleCarre(1,3));
-        cellulesDepart.addAll(Motifs.barreVerticale(7,2));
-
-        // Pour lever une exception s'il y a un problème de coordonnées en dehors de la grille
+        // Initialiser les motifs
         try {
-            // Initialiser la grille et créer les cellules de départ
-            grille = new Grille(10, 10, 20, cellulesDepart);
+            Motifs.initialiserMotifs("data/motifs/");
+            motifs = Motifs.getMotifs();
         } catch (Exception e) {
-            throw e;
+            e.printStackTrace();
         }
+
+        // Initialiser la grille
+        grille = new Grille(lignes, colonnes, Motifs.getPeriodiciteMax());
+
+        // Exemple d'insertion de motif (exemple à ne pas garder ici)
+        grille.insererMotif(motifs.get(0),new int[]{3,3});
+
+        // Pour charger depuis un fichier
+        //grille.chargerGrille("data/grilles/grille.txt");
     }
-    
+
     // Methode statique pour avancer d'un tour dans le jeu
-	private static boolean avancerTour() {
-        if (tour == 0) {
-            initialiserGrille();
-            System.out.println("Grille de départ");
-            grille.afficher();
-        } else {
-            grille.evoluerGrille();
-            System.out.println("Tour " + tour);
-            grille.afficher();
-            
-            // Vérifier si la grille efile while parsingst vide
-            if (grille.estGrilleVide()) {
-                System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.");
-                return false;
-            }
-            
-            // Vérifier si la grille se répète
-            if (grille.grilleSeRepete()) {
-                System.out.println("Le jeu s'arrête car la grille se répète.");
-                return false;
-            }
+    private static boolean avancerTour() {
+        System.out.println("Tour " + tour);
+        if(tour != 0) grille.evoluerGrille(methodeEvolution);
+        else initialiserGrille();
+
+        grille.afficher();
+
+        HashMap<String, Integer> motifsDetectes = grille.detecterMotifs(tour);
+        if(!motifsDetectes.isEmpty()) System.out.println("Motifs détectés :");
+        for (String name : motifsDetectes.keySet()) {
+            String value = motifsDetectes.get(name).toString();
+            System.out.println(name + " " + value);
         }
+
+        // Vérifier si la grille est vide
+        if (grille.estGrilleVide()) {
+            System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.\n");
+            return false;
+        }
+
+        // Vérifier si la grille se répète
+        if (grille.grilleSeRepete()) {
+            System.out.println("Le jeu s'arrête car la grille se répète.\n");
+            return false;
+        }
+
         tour += 1;
+        System.out.println();
         return true;
     }
-
 
     // Méthode statique principale du projet
     public static void main(String[] args) {
         // Le jeu s'arrête lorsqu'une répétition est détectée ou que la grille est vide
         while(avancerTour());
-        //grille.sauvegarderGrille("nouvelle_grille.txt");
+
+        //grille.sauvegarderGrille("data/grilles/nouvelle_grille.txt");
     }
 }
-
