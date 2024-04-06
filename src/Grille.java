@@ -9,13 +9,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 class Grille {
-    private int colonnes;
-    private int lignes;
+    public int colonnes;
+    public int lignes;
     private int periodiciteMax;
     public Cellule[][] grille;
     private List<Cellule[][]> etatsPrecedents;
 
-    public Grille(int lignes, int colonnes, int periodiciteMax) {
+    public Grille(int colonnes, int lignes, int periodiciteMax) {
         this.lignes = lignes;
         this.colonnes = colonnes;
         this.periodiciteMax = periodiciteMax;
@@ -24,15 +24,15 @@ class Grille {
         initialiserGrille();
     }
 
-    public boolean estDansGrille(int c, int l) {
-        return !(l < 0 || l >= lignes || c < 0 || c >= colonnes);
+    public boolean estDansGrille(int x, int y) {
+        return !(y < 0 || y >= lignes || x < 0 || x >= colonnes);
     }
 
-    public void naitreCellule(int c, int l) throws IllegalArgumentException {
-        if (!estDansGrille(c, l)) {
+    public void naitreCellule(int x, int y) throws IllegalArgumentException {
+        if (!estDansGrille(x, y)) {
             throw new IllegalArgumentException("Coordonnées en dehors des limites de la grille.");
         } else {
-            grille[l][c].setEnVie(true);
+            grille[y][x].setEnVie(true);
         }
     }
 
@@ -42,11 +42,11 @@ class Grille {
         }
     }
 
-    public void tuerCellule(int l, int c) throws IllegalArgumentException {
-        if (!estDansGrille(l, c)) {
+    public void tuerCellule(int x, int y) throws IllegalArgumentException {
+        if (!estDansGrille(x, y)) {
             throw new IllegalArgumentException("Coordonnées en dehors des limites de la grille.");
         } else {
-            grille[l][c].setEnVie(false);
+            grille[y][x].setEnVie(false);
         }
     }
 
@@ -55,6 +55,7 @@ class Grille {
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {
                 grille[i][j] = new Cellule();
+                grille[i][j].setEnVie(false);
                 grille[i][j].setPosition(new int[]{i, j});
             }
         }
@@ -172,7 +173,6 @@ class Grille {
             }
         }
         // Sauvegarder l'état actuel
-        sauvegarderEtat();
     }
 
     // Méthode pour afficher la grille contenant les cellules
@@ -247,24 +247,24 @@ class Grille {
     }
 
     // Méthode pour vérifier si la grille se répète
-    public boolean grilleSeRepete() {
-    	int i;
-    	int periode;
-        // Parcourir les états précédents pour détecter une répétition
-        for (i = 0; i < etatsPrecedents.size(); i++) {
-            if (equalsGrille(etatsPrecedents.get(i))) {
-                // Calculer la périodicité
-                periode = etatsPrecedents.size() - i + 1;
-                System.out.println("La grille se répète après " + (i + 1) + " itération(s).");
-                System.out.println("Périodicité : " + periode);
-                return true;
-            }
+	public boolean grilleSeRepete() {
+    int periode = 0;
+    // Parcourir les états précédents pour détecter une répétition
+    for (int index = 0; index < etatsPrecedents.size(); index++) {
+        if (equalsGrille(etatsPrecedents.get(index))) {
+            // Calculer la périodicité
+            periode = etatsPrecedents.size() - index;
+            System.out.println("La grille se répète après " + index + " itération(s).");
+            System.out.println("Périodicité : " + periode);
+            return true;
         }
-        return false;
     }
+    return false;
+}
+
 
     // Méthode pour sauvegarder l'état actuel de la grille
-    private void sauvegarderEtat() {
+    public void sauvegarderEtat() {
         Cellule[][] copie = new Cellule[lignes][colonnes];
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {

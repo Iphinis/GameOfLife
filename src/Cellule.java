@@ -58,12 +58,12 @@ class Cellule {
 	}
 
 	public void evoluer() {
-		enVie = prochainEtat;
+		setEnVie(prochainEtat);
 	}
 
 	public void determinerProchainEtatClassique() {
 		int voisinsVivants = voisinsVivants();
-		if (enVie) {
+		if (getEnVie()) {
 			if (voisinsVivants < 2 || voisinsVivants > 3) {
 				prochainEtat = false; // Mort par solitude ou surpopulation
 			} else {
@@ -78,7 +78,7 @@ class Cellule {
 
 	public void determinerProchainEtatHighlife() {
 		int voisinsVivants = voisinsVivants();
-		if (enVie) {
+		if (getEnVie()) {
 			if (voisinsVivants < 2 || voisinsVivants > 3) {
 				prochainEtat = false; // Mort par solitude ou surpopulation
 			} else {
@@ -93,7 +93,7 @@ class Cellule {
 
 	public void determinerProchainEtatReplicator() {
 		int voisinsVivants = voisinsVivants();
-		if (enVie) {
+		if (getEnVie()) {
 			if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 7) {
 				prochainEtat = true; // Survie
 			} else {
@@ -108,7 +108,7 @@ class Cellule {
 
 	public void determinerProchainEtatDayAndNight() {
 		int voisinsVivants = voisinsVivants();
-		if (enVie) {
+		if (getEnVie()) {
 			if (voisinsVivants == 3 || voisinsVivants == 4 || voisinsVivants == 6 || voisinsVivants == 7) {
 				prochainEtat = true; // Survie
 			} else {
@@ -123,7 +123,7 @@ class Cellule {
 
 	public void determinerProchainEtatLifeWithoutDeath() {
 		int voisinsVivants = voisinsVivants();
-		if (voisinsVivants == 3 || enVie) {
+		if (voisinsVivants == 3 || getEnVie()) {
 			prochainEtat = true;
 		} else {
 			prochainEtat = false;
@@ -132,7 +132,7 @@ class Cellule {
 
 	public void determinerProchainEtatAmoeba() {
 		int voisinsVivants = voisinsVivants();
-		if (enVie) {
+		if (getEnVie()) {
 			if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 8
 					|| voisinsVivants == 9) {
 				prochainEtat = true; // Survie

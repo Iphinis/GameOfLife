@@ -2,6 +2,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.io.File;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 class Jeu {
     static Grille grille;
@@ -30,7 +34,7 @@ class Jeu {
         }
 
         // Initialiser la grille
-        grille = new Grille(lignes, colonnes, Motifs.getPeriodiciteMax());
+        grille = new Grille(colonnes, lignes, Motifs.getPeriodiciteMax());
 
         // Exemple d'insertion de motif (exemple à ne pas garder ici)
         //grille.insererMotif(motifs.get(0),new int[]{3,3});
@@ -38,8 +42,9 @@ class Jeu {
         // Pour charger depuis un fichier
         //grille.chargerGrille("data/grilles/grille.txt");
     }
+    
 
-	private static void insererCellules() {
+	private static void naitreCellules() {
 		Scanner scanner = new Scanner(System.in);
 		int nb, k, x, y;
 
@@ -48,6 +53,7 @@ class Jeu {
 		scanner.nextLine();
 
 		for (k = 0; k < nb; k++) {
+		System.out.print("Cellule n°" + (k+1) +"\n");
 			do {
 				System.out.print("Saisir x entre 0 et " + (colonnes - 1) + " : ");
 				x = scanner.nextInt();
@@ -55,22 +61,22 @@ class Jeu {
 				System.out.print("Saisir y entre 0 et " + (lignes - 1) + " : ");
 				y = scanner.nextInt();
 				scanner.nextLine();
-			} while (grille.estDansGrille(x,y));
+			} while (!grille.estDansGrille(x,y));
 		grille.naitreCellule(x,y);
-		grille.afficher();
-		scanner.close();
+		//scanner.close();
 		}
 	}
 	
-	private static void retirerCellules() {
+	private static void tuerCellules() {
 		Scanner scanner = new Scanner(System.in);
 		int nb, k, x, y;
 
-		System.out.print("Combien de cellules mortes insérer ? ");
+		System.out.print("Combien de cellules tuer ? ");
 		nb = scanner.nextInt();
 		scanner.nextLine();
 
 		for (k = 0; k < nb; k++) {
+		System.out.print("Cellule n°" + (k+1) +"\n");
 			do {
 				System.out.print("Saisir x entre 0 et " + (colonnes - 1) + " : ");
 				x = scanner.nextInt();
@@ -78,10 +84,9 @@ class Jeu {
 				System.out.print("Saisir y entre 0 et " + (lignes - 1) + " : ");
 				y = scanner.nextInt();
 				scanner.nextLine();
-			} while (grille.estDansGrille(x,y));
+			} while (!grille.estDansGrille(x,y));
 		grille.tuerCellule(x,y);
-		grille.afficher();
-		scanner.close();
+		//scanner.close();
 		}
 	}
 	
@@ -104,80 +109,86 @@ class Jeu {
 		scanner.nextLine(); // Consommer le retour à la ligne
 	} while (choix < 1 || choix > 6); // Répéter tant que le choix n'est pas valide
 	methodeEvolution = choix;
-	scanner.close();
+	//scanner.close();
 	}
 
 
 	private static void menuTour() {
-	int choix;
-	do {
-		grille.afficher();
-		System.out.println("1. Réinitialiser la grille");
-		System.out.println("2. Insérer cellule(s)");
-		System.out.println("3. Retirer cellule(s)");
-		System.out.println("4. Avancer de n tours");
-		System.out.println("5. Changer le mode de jeu : actuel = " + modes[methodeEvolution - 1]);
-		System.out.println("6. Sauvegarder la grille");
-		System.out.println("7. Quitter");
-		System.out.print("Choix : ");
+    int choix;
+    Scanner scanner = new Scanner(System.in); // Créer le scanner en dehors de la boucle
+    do {
+    	System.out.println("Grille actuelle");
+        grille.afficher();
+        System.out.println("1. Réinitialiser la grille");
+        System.out.println("2. Insérer cellule(s)");
+        System.out.println("3. Tuer cellule(s)");
+        System.out.println("4. Avancer de n tours");
+        System.out.println("5. Changer le mode de jeu : actuel = " + modes[methodeEvolution - 1]);
+        System.out.println("6. Sauvegarder la grille");
+        System.out.println("7. Quitter");
+        System.out.print("Choix : ");
 
-		Scanner scanner = new Scanner(System.in);
-		choix = scanner.nextInt();
-		if (scanner.hasNextInt()) { // Check if next token is an integer
-			choix = 0;
-			choix = scanner.nextInt();
-			switch (choix) {
-				case 1:
-					initialiserGrille();
-					break;
-				case 2:
-					insererCellules();
-					break;
-				case 3:
-					retirerCellules();
-					break;
-				case 4:
-					System.out.print("Entrez le nombre de tours à avancer : ");
-					int nbTours;
-					if (scanner.hasNextInt()) {
-						nbTours = scanner.nextInt();
-						avancerTour(nbTours);
-					} else {
-						System.out.println("Nombre de tours invalide.");
-						scanner.nextLine(); // Consume the invalid input
-					}
-					break;
-				case 5:
-					changerModeJeu();
-					break;
-				case 6:
-					grille.sauvegarderGrille("data/grille/nouvelle_grille.txt");
-					break;
-				case 7:
-					System.out.println("Au revoir !");
-					System.exit(0);
-					break;
-				default:
-					System.out.println("Choix invalide. Veuillez choisir une option valide.");
-					break;
-			}
-		} else {
-			System.out.println("Entrée invalide. Veuillez entrer un nombre.");
-		}
-		scanner.close(); // Close the scanner
-	} while (choix != 7);
+        
+            choix = scanner.nextInt();
+            switch (choix) {
+                case 1:
+                    initialiserGrille();
+                    System.out.print("OK REINITIALISATION GRILLE\n");
+                    break;
+                case 2:
+                   //System.out.print("x = " + grille.colonnes);
+                   //System.out.print("y = " + grille.lignes);
+                   //System.out.print("OK COORDONNEES X Y\n");
+                    naitreCellules();
+                    System.out.print("OK NAISSANCE CELLULES\n");
+                    break;
+                case 3:
+                    tuerCellules();
+                    System.out.print("OK TUER CELLULES\n");
+                    break;
+                case 4:
+                    System.out.print("Entrez le nombre de tours à avancer : ");
+                    int nbTours;
+                    if (scanner.hasNextInt()) {
+                        nbTours = scanner.nextInt();
+                        avancerTour(nbTours);
+                    } else {
+                        System.out.println("Nombre de tours invalide.");
+                        scanner.nextLine(); // Consume the invalid input
+                    }
+                    break;
+                case 5:
+                    changerModeJeu();
+                    break;
+                case 6:
+                    grille.sauvegarderGrille("data/grille/nouvelle_grille.txt");
+                    break;
+                case 7:
+                    System.out.println("Au revoir !");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Choix invalide. Veuillez choisir une option valide.");
+                    break;
+            }
+    } while (choix != 7);
+    scanner.close(); // Fermer le scanner après avoir terminé la boucle
 }
+
 
 
         
      // Methode statique pour avancer d'un tour dans le jeu
     private static void avancerTour(int n) {
-    	int tour=0;
+    	int tour=1;
     	boolean valide=true;
-    	
+    	grille.sauvegarderEtat();
     	while((valide) && (tour<n)){
+    		
+    		
 		System.out.println("Tour " + tour);
 		grille.evoluerGrille(methodeEvolution);
+		tour += 1;
 
 		grille.afficher();
 
@@ -195,13 +206,14 @@ class Jeu {
 		}
 
 		// Vérifier si la grille se répète
-		if (grille.grilleSeRepete()) {
+		if ((tour>2) && (grille.grilleSeRepete())) {
 		    System.out.println("Le jeu s'arrête car la grille se répète.\n");
 		    valide = false;
 		}
 
-		tour += 1;
+		
 		System.out.println();
+		grille.sauvegarderEtat();
         }
     }
     
@@ -218,7 +230,7 @@ class Jeu {
             System.out.println("1. Nouvelle partie");
             System.out.println("2. Charger une partie");
             System.out.println("3. Quitter");
-                       
+                     
             choix = scanner.nextInt();
             scanner.nextLine(); 
 
@@ -251,7 +263,7 @@ class Jeu {
 	    }
 
 	} while((choix !=3) && (grilleInit==false));
-	scanner.close();
+	//scanner.close();
 	}
 	
 	private static String menuChoixFichier(File[] fichiers) {
@@ -279,14 +291,12 @@ class Jeu {
                 System.out.println("Nom de fichier invalide. Veuillez choisir un fichier valide.");
             }
         } while (!fichierValide);
-        scanner.close();
+       // scanner.close();
         return nomFichier;
     }
     
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         menuInitGrille();
         menuTour();
-        scanner.close();
     }
 }
