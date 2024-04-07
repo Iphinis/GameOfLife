@@ -8,7 +8,7 @@ class Jeu {
     static int lignes = 10;
     static int colonnes = 20;
     static int tour = 0;
-    static int methodeEvolution = 1;
+    static int methodeEvolution = 0;
     static List<Motif> motifs;
 
     static enum ModeJeu {
@@ -117,7 +117,7 @@ class Jeu {
             choix = scanner.nextInt();
             scanner.nextLine(); // Consommer le retour à la ligne
         } while (choix < 1 || choix > 6); // Répéter tant que le choix n'est pas valide
-        methodeEvolution = choix;
+        methodeEvolution = choix-1;
     }
 
     private static void menuTour(Scanner scanner) {
@@ -131,23 +131,27 @@ class Jeu {
             System.out.println("3. Insérer motif");
             System.out.println("4. Tuer cellule(s)");
             System.out.println("5. Avancer de n tours");
-            System.out.println("6. Changer le mode de jeu : actuel = " + modes[methodeEvolution - 1]);
+            System.out.println("6. Changer le mode de jeu : actuel = " + modes[methodeEvolution]);
             System.out.println("7. Sauvegarder la grille");
             System.out.println("8. Quitter");
             System.out.print("Choix : ");
-
+            System.out.println(grille.grille[5][9].getEnVie());
+	    System.out.println(grille.grille[5][9].voisins.size());
             choix = scanner.nextInt();
             switch (choix) {
                 case 1:
                     initialiserGrille();
-                    //System.out.print("OK REINITIALISATION GRILLE\n");
+                    System.out.print("OK REINITIASALITION GRILLE\n");
+                    System.out.print("COLONNES = " + grille.colonnes + "\n");
+                    System.out.print("LIGNES = " + grille.lignes + "\n");
+                    System.out.print("PERIODMAX = " + grille.periodiciteMax + "\n");
                     break;
                 case 2:
                     // System.out.print("x = " + grille.colonnes);
                     // System.out.print("y = " + grille.lignes);
                     // System.out.print("OK COORDONNEES X Y\n");
                     naitreCellules(scanner);
-                    //System.out.print("OK NAISSANCE CELLULES\n");
+                    System.out.print("OK NAISSANCE CELLULES\n");
                     break;
                 case 3:
                     naitreMotif(scanner);
@@ -155,10 +159,10 @@ class Jeu {
                     break;
                 case 4:
                     tuerCellules(scanner);
-                    //System.out.print("OK TUER CELLULES\n");
+                    System.out.print("OK TUER CELLULES\n");
                     break;
                 case 5:
-                    System.out.print("Entrez le nombre de tours à avancer : ");
+                    System.out.print("Entrez le nombre d'iterations a effectuer : ");
                     int nbTours;
                     if (scanner.hasNextInt()) {
                         nbTours = scanner.nextInt();
@@ -187,15 +191,16 @@ class Jeu {
 
     // Methode statique pour avancer d'un tour dans le jeu
     private static void avancerTour(int n) {
-        int tour = 1;
+        int tour = 0;
         boolean valide = true;
         grille.sauvegarderEtat();
-        while ((valide) && (tour <= n)) {
-
+        
+        while ((valide) && (tour < n)) {
+	    tour += 1;
             System.out.println("nb etats enregistres = " + grille.etatsPrecedents.size());
             System.out.println("Tour " + tour);
             grille.evoluerGrille(methodeEvolution);
-            tour += 1;
+            
 
             grille.afficher();
 
@@ -206,7 +211,7 @@ class Jeu {
                 String value = motifsDetectes.get(name).toString();
                 System.out.println(name + " " + value);
             }
-
+            
             // Vérifier si la grille est vide
             if (grille.estGrilleVide()) {
                 System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.\n");
@@ -221,6 +226,7 @@ class Jeu {
 
             System.out.println();
             grille.sauvegarderEtat();
+
         }
     }
 
@@ -243,6 +249,10 @@ class Jeu {
             switch (choix) {
                 case 1:
                     initialiserGrille();
+                    System.out.print("OK INITIASALITION GRILLE\n");
+                    System.out.print("COLONNES = " + grille.colonnes + "\n");
+                    System.out.print("LIGNES = " + grille.lignes + "\n");
+                    System.out.print("PERIODMAX = " + grille.periodiciteMax + "\n");
                     grilleInit = true;
                     break;
                 case 2:
@@ -253,7 +263,10 @@ class Jeu {
                             nomFichier = menuChoixFichier(scanner, fichiers);
                             //System.out.println("OK TEST CHOIX NOM FICHIER");
                             grille.chargerGrille("data/grilles/" + nomFichier);
-                            System.out.println("Grille chargée");
+                            System.out.print("OK CHARGEMENT GRILLE\n");
+                    System.out.print("COLONNES = " + grille.colonnes + "\n");
+                    System.out.print("LIGNES = " + grille.lignes + "\n");
+                    System.out.print("PERIODMAX = " + grille.periodiciteMax + "\n");
                             grilleInit = true;
                         } else {
                             System.out.println("Le répertoire est vide.");

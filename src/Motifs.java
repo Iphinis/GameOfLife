@@ -140,6 +140,6 @@ public class Motifs {
         return listeMotifs.stream()
             .mapToInt(motif -> motif.getListeVivantes().size())
             .max()
-            .orElse(0);
+            .orElse(20);
     }
 }

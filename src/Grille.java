@@ -10,7 +10,7 @@ import java.io.IOException;
 class Grille {
     public int colonnes;
     public int lignes;
-    private int periodiciteMax;
+    public int periodiciteMax;
     public Cellule[][] grille;
     public List<Cellule[][]> etatsPrecedents;
 
@@ -55,6 +55,7 @@ class Grille {
             for (int j = 0; j < colonnes; j++) {
                 grille[i][j] = new Cellule();
                 grille[i][j].setEnVie(false);
+                grille[i][j].setProchainEtat(false);
                 grille[i][j].setPosition(new int[] { i, j });
             }
         }
@@ -105,14 +106,7 @@ class Grille {
 
     // Méthode pour faire évoluer les grille
     public void evoluerGrille(int choix) {
-        // Vérifier si la grille est vide
-        if (estGrilleVide()) {
-            System.out.println("Toutes les grille sont mortes. Arrêt du jeu.");
-            return;
-        }
-
-        // Déterminer le prochain état des grille à l'étape suivante
-
+     // Déterminer le prochain état des grille à l'étape suivante
         switch (choix) {
             case 0:
                 for (int i = 0; i < lignes; i++) {
@@ -171,7 +165,6 @@ class Grille {
                 grille[i][j].evoluer();
             }
         }
-        // Sauvegarder l'état actuel
     }
 
     // Méthode pour afficher la grille contenant les cellules

@@ -6,7 +6,7 @@ class Cellule {
 	private boolean enVie;
 	private boolean prochainEtat;
 	private int[] position;
-	private List<Cellule> voisins;
+	public List<Cellule> voisins;
 
 	public Cellule() {
 		this.enVie = false;
@@ -51,27 +51,27 @@ class Cellule {
 		int s = 0;
 		int n = voisins.size();
 		for (int i = 0; i < n; i++) {
-			if (voisins.get(i).enVie)
+			if (voisins.get(i).getEnVie())
 				s += 1;
 		}
 		return s;
 	}
 
 	public void evoluer() {
-		setEnVie(prochainEtat);
+		setEnVie(getProchainEtat());
 	}
 
 	public void determinerProchainEtatClassique() {
 		int voisinsVivants = voisinsVivants();
 		if (getEnVie()) {
 			if (voisinsVivants < 2 || voisinsVivants > 3) {
-				prochainEtat = false; // Mort par solitude ou surpopulation
+				setProchainEtat(false); // Mort par solitude ou surpopulation
 			} else {
-				prochainEtat = true; // Survie
+				setProchainEtat(true); // Survie
 			}
 		} else {
 			if (voisinsVivants == 3) {
-				prochainEtat = true; // Naissance
+				setProchainEtat(true); // Naissance
 			}
 		}
 	}
@@ -80,13 +80,13 @@ class Cellule {
 		int voisinsVivants = voisinsVivants();
 		if (getEnVie()) {
 			if (voisinsVivants < 2 || voisinsVivants > 3) {
-				prochainEtat = false; // Mort par solitude ou surpopulation
+				setProchainEtat(false);// Mort par solitude ou surpopulation
 			} else {
-				prochainEtat = true; // Survie
+				setProchainEtat(true); // Survie
 			}
 		} else {
 			if (voisinsVivants == 3 || voisinsVivants == 6) {
-				prochainEtat = true; // Naissance
+				setProchainEtat(true); // Naissance
 			}
 		}
 	}
@@ -95,13 +95,13 @@ class Cellule {
 		int voisinsVivants = voisinsVivants();
 		if (getEnVie()) {
 			if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 7) {
-				prochainEtat = true; // Survie
+				setProchainEtat(true); // Survie
 			} else {
-				prochainEtat = false; // Mort
+				setProchainEtat(false); // Mort
 			}
 		} else {
 			if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 7) {
-				prochainEtat = true; // Naissance
+				setProchainEtat(true); // Naissance
 			}
 		}
 	}
@@ -110,13 +110,13 @@ class Cellule {
 		int voisinsVivants = voisinsVivants();
 		if (getEnVie()) {
 			if (voisinsVivants == 3 || voisinsVivants == 4 || voisinsVivants == 6 || voisinsVivants == 7) {
-				prochainEtat = true; // Survie
+				setProchainEtat(true); // Survie
 			} else {
-				prochainEtat = false; // Mort
+				setProchainEtat(false); // Mort
 			}
 		} else {
 			if (voisinsVivants == 3 || voisinsVivants == 6 || voisinsVivants == 7 || voisinsVivants == 8) {
-				prochainEtat = true; // Naissance
+				setProchainEtat(true); // Naissance
 			}
 		}
 	}
@@ -124,9 +124,9 @@ class Cellule {
 	public void determinerProchainEtatLifeWithoutDeath() {
 		int voisinsVivants = voisinsVivants();
 		if (voisinsVivants == 3 || getEnVie()) {
-			prochainEtat = true;
+			setProchainEtat(true);
 		} else {
-			prochainEtat = false;
+			setProchainEtat(false);
 		}
 	}
 
@@ -135,14 +135,14 @@ class Cellule {
 		if (getEnVie()) {
 			if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 8
 					|| voisinsVivants == 9) {
-				prochainEtat = true; // Survie
+				setProchainEtat(true); // Survie
 			} else {
-				prochainEtat = false; // Mort
+				setProchainEtat(false); // Mort
 			}
 		} else {
 			if (voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 6 || voisinsVivants == 7
 					|| voisinsVivants == 8) {
-				prochainEtat = true; // Naissance
+				setProchainEtat(true); // Naissance
 			}
 		}
 	}
