@@ -1,5 +1,4 @@
 import java.util.List;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.BufferedReader;
@@ -38,7 +37,7 @@ class Grille {
 
     public void insererMotif(Motif motif, int[] origine) throws IllegalArgumentException {
         for (int[] coos : motif.getListeVivantes()) {
-            naitreCellule(origine[0]+coos[0], origine[1]+coos[1]);
+            naitreCellule(origine[0] + coos[0], origine[1] + coos[1]);
         }
     }
 
@@ -56,7 +55,7 @@ class Grille {
             for (int j = 0; j < colonnes; j++) {
                 grille[i][j] = new Cellule();
                 grille[i][j].setEnVie(false);
-                grille[i][j].setPosition(new int[]{i, j});
+                grille[i][j].setPosition(new int[] { i, j });
             }
         }
         // Initialiser les voisins des cellules
@@ -247,18 +246,17 @@ class Grille {
     }
 
     // Méthode pour vérifier si la grille se répète
-	public boolean grilleSeRepete() {
-		// Parcourir les états précédents pour détecter une répétition
-		for (int i = 0; i < etatsPrecedents.size() - 1; i++) { // Parcourir jusqu'à l'avant-dernier état
-		if (equalsGrille(etatsPrecedents.get(i))) {
-		    // Une répétition a été détectée
-		    System.out.println("La grille se répète après " + (i + 1) + " itération(s).");
-		    return true;
-		}
-		}
-		return false;
-	}
-
+    public boolean grilleSeRepete() {
+        // Parcourir les états précédents pour détecter une répétition
+        for (int i = 0; i < etatsPrecedents.size() - 1; i++) { // Parcourir jusqu'à l'avant-dernier état
+            if (equalsGrille(etatsPrecedents.get(i))) {
+                // Une répétition a été détectée
+                System.out.println("La grille se répète après " + (i + 1) + " itération(s).");
+                return true;
+            }
+        }
+        return false;
+    }
 
     // Méthode pour sauvegarder l'état actuel de la grille
     public void sauvegarderEtat() {
@@ -276,74 +274,73 @@ class Grille {
     }
 
     public void sauvegarderGrille(String nomFichier) {
-    try {
-        // Création d'un FileWriter pour écrire dans le fichier spécifié
-        FileWriter fileWriter = new FileWriter(nomFichier, false);
+        try {
+            // Création d'un FileWriter pour écrire dans le fichier spécifié
+            FileWriter fileWriter = new FileWriter(nomFichier, false);
 
-        // Création d'un BufferedWriter qui utilise le FileWriter
-        BufferedWriter writer = new BufferedWriter(fileWriter);
+            // Création d'un BufferedWriter qui utilise le FileWriter
+            BufferedWriter writer = new BufferedWriter(fileWriter);
 
-        // Sauvegarde du nombre de lignes et de colonnes dans le fichier
-        writer.write(String.valueOf(this.lignes));
-        writer.newLine();
-        writer.write(String.valueOf(this.colonnes));
-        writer.newLine();
-
-        // Sauvegarde de la grille dans le fichier
-        for (int i = 0; i < lignes; i++) {
-            for (int j = 0; j < colonnes; j++) {
-           
-                if (grille[i][j].getEnVie()) {
-                    writer.write("O");
-                } else {
-                    writer.write("_");
-                }
-            }
+            // Sauvegarde du nombre de lignes et de colonnes dans le fichier
+            writer.write(String.valueOf(this.lignes));
             writer.newLine();
+            writer.write(String.valueOf(this.colonnes));
+            writer.newLine();
+
+            // Sauvegarde de la grille dans le fichier
+            for (int i = 0; i < lignes; i++) {
+                for (int j = 0; j < colonnes; j++) {
+
+                    if (grille[i][j].getEnVie()) {
+                        writer.write("O");
+                    } else {
+                        writer.write("_");
+                    }
+                }
+                writer.newLine();
+            }
+            // Fermeture du BufferedWriter
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        // Fermeture du BufferedWriter
-        writer.close();
-    } catch (IOException e) {
-        e.printStackTrace();
     }
-}
 
+    public void chargerGrille(String nomFichier) {
+        try {
+            // Création d'un FileReader pour lire à partir du fichier spécifié
+            FileReader fileReader = new FileReader(nomFichier);
 
- public void chargerGrille(String nomFichier) {
-    try {
-        // Création d'un FileReader pour lire à partir du fichier spécifié
-        FileReader fileReader = new FileReader(nomFichier);
+            // Création d'un BufferedReader qui utilise le FileReader
+            BufferedReader reader = new BufferedReader(fileReader);
 
-        // Création d'un BufferedReader qui utilise le FileReader
-        BufferedReader reader = new BufferedReader(fileReader);
+            // Lecture des lignes et des colonnes depuis le fichier
+            lignes = Integer.parseInt(reader.readLine());
+            colonnes = Integer.parseInt(reader.readLine());
 
-        // Lecture des lignes et des colonnes depuis le fichier
-        lignes = Integer.parseInt(reader.readLine());
-        colonnes = Integer.parseInt(reader.readLine());
+            // Initialisation de la grille avec les dimensions lues
+            grille = new Cellule[lignes][colonnes];
 
-        // Initialisation de la grille avec les dimensions lues
-        grille = new Cellule[lignes][colonnes];
-
-        // Lecture de la grille depuis le fichier
-        for (int i = 0; i < lignes; i++) {
-            String ligne = reader.readLine();
-            for (int j = 0; j < colonnes; j++) {
-                // Initialisation des cellules de la grille en fonction des caractères lus
-                grille[i][j] = new Cellule();
-                if (ligne.charAt(j) == 'O') {
-                    grille[i][j].setEnVie(true);
-                } else {
-                    grille[i][j].setEnVie(false);
+            // Lecture de la grille depuis le fichier
+            for (int i = 0; i < lignes; i++) {
+                String ligne = reader.readLine();
+                for (int j = 0; j < colonnes; j++) {
+                    // Initialisation des cellules de la grille en fonction des caractères lus
+                    grille[i][j] = new Cellule();
+                    if (ligne.charAt(j) == 'O') {
+                        grille[i][j].setEnVie(true);
+                    } else {
+                        grille[i][j].setEnVie(false);
+                    }
                 }
             }
-        }
 
-        // Fermeture du BufferedReader
-        reader.close();
-    } catch (IOException e) {
-        e.printStackTrace();
+            // Fermeture du BufferedReader
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 
     public HashMap<String, Integer> detecterMotifs(int tour) {
         List<Motif> listeMotifs = Motifs.getMotifs();
@@ -354,7 +351,8 @@ class Grille {
             for (int j = 0; j < colonnes; j++) {
                 for (Motif motif : listeMotifs) {
                     boolean trouve = true;
-                    if(tour % motif.getPeriodicite() != 0) break;
+                    if (tour % motif.getPeriodicite() != 0)
+                        break;
                     for (int[] coos : motif.getListeVivantes()) {
                         if (!estDansGrille(i + coos[0], j + coos[1])) {
                             trouve = false;
@@ -390,16 +388,16 @@ class Grille {
         }
         return motifsDetectes;
     }
-    
-    	public boolean equalsGrille(Cellule[][] grille1) {
-   	 for (int i = 0; i < lignes; i++) {
-        for (int j = 0; j < colonnes; j++) {
-            if (!grille[i][j].equals(grille1[i][j])){
-                return false;
+
+    public boolean equalsGrille(Cellule[][] grille1) {
+        for (int i = 0; i < lignes; i++) {
+            for (int j = 0; j < colonnes; j++) {
+                if (!grille[i][j].equals(grille1[i][j])) {
+                    return false;
+                }
             }
         }
-   	 }
-    	return true;
-}	
-	
+        return true;
+    }
+
 }
