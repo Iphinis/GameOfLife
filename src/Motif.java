@@ -58,18 +58,17 @@ public class Motif {
         for (int[] coos : listeVivantes) {
             boolean trouve = false;
             for (int[] coos2 : autreListeVivantes) {
-                //if (Arrays.equals(Arrays.stream(coos).map(x -> Math.abs(x)).toArray(), Arrays.stream(coos2).map(x -> Math.abs(x)).toArray())) {
-                if (Arrays.equals(coos, coos2)) {
+                if (Arrays.equals(coos, coos2) ||
+                    Arrays.equals(Arrays.stream(coos).map(x -> Math.abs(x)).toArray(), coos2) ||
+                    Arrays.equals(coos, Arrays.stream(coos2).map(x -> Math.abs(x)).toArray())) {
                     trouve = true;
                     break;
                 }
             }
             if (!trouve) {
-                //System.out.println("FAUX");
                 return false;
             }
         }
-        //System.out.println("VRAI");
         return true;
     }
 

@@ -1,11 +1,6 @@
 import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 
 class Grille {
     public int colonnes;
@@ -14,7 +9,7 @@ class Grille {
     public Cellule[][] grille;
     public List<boolean[][]> grillesPrecedentes;
 
-    public Grille(int colonnes, int lignes, int periodiciteMax) {
+    public Grille(int lignes, int colonnes, int periodiciteMax) {
         this.lignes = lignes;
         this.colonnes = colonnes;
         this.periodiciteMax = periodiciteMax;
@@ -27,11 +22,11 @@ class Grille {
         return !(l < 0 || l >= lignes || c < 0 || c >= colonnes);
     }
 
-    public void naitreCellule(int x, int y) throws IllegalArgumentException {
-        if (!estDansGrille(x, y)) {
+    public void naitreCellule(int l, int c) throws IllegalArgumentException {
+        if (!estDansGrille(l, c)) {
             throw new IllegalArgumentException("Coordonnées en dehors des limites de la grille.");
         } else {
-            grille[y][x].setEnVie(true);
+            grille[l][c].setEnVie(true);
         }
     }
 
@@ -41,11 +36,11 @@ class Grille {
         }
     }
 
-    public void tuerCellule(int x, int y) throws IllegalArgumentException {
-        if (!estDansGrille(x, y)) {
+    public void tuerCellule(int l, int c) throws IllegalArgumentException {
+        if (!estDansGrille(l, c)) {
             throw new IllegalArgumentException("Coordonnées en dehors des limites de la grille.");
         } else {
-            grille[y][x].setEnVie(false);
+            grille[l][c].setEnVie(false);
         }
     }
 
@@ -235,122 +230,65 @@ class Grille {
         }
         System.out.print(res);
 
-        System.out.println(bordure + "\n");
+        System.out.println(bordure);
     }
 
-    public void sauvegarderGrille(String nomFichier) {
-        try {
-            // Création d'un FileWriter pour écrire dans le fichier spécifié
-            FileWriter fileWriter = new FileWriter(nomFichier, false);
-
-            // Création d'un BufferedWriter qui utilise le FileWriter
-            BufferedWriter writer = new BufferedWriter(fileWriter);
-
-            // Sauvegarde du nombre de lignes et de colonnes dans le fichier
-            writer.write(String.valueOf(this.lignes));
-            writer.newLine();
-            writer.write(String.valueOf(this.colonnes));
-            writer.newLine();
-
-            // Sauvegarde de la grille dans le fichier
-            for (int i = 0; i < lignes; i++) {
-                for (int j = 0; j < colonnes; j++) {
-
-                    if (grille[i][j].getEnVie()) {
-                        writer.write("O");
-                    } else {
-                        writer.write("_");
-                    }
-                }
-                writer.newLine();
-            }
-            // Fermeture du BufferedWriter
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void chargerGrille(String nomFichier) {
-        try {
-            // Création d'un FileReader pour lire à partir du fichier spécifié
-            FileReader fileReader = new FileReader(nomFichier);
-
-            // Création d'un BufferedReader qui utilise le FileReader
-            BufferedReader reader = new BufferedReader(fileReader);
-
-            // Lecture des lignes et des colonnes depuis le fichier
-            lignes = Integer.parseInt(reader.readLine());
-            colonnes = Integer.parseInt(reader.readLine());
-            periodiciteMax = Motifs.getPeriodiciteMax();
-
-            // Initialisation de la grille avec les dimensions lues
-            initialiserGrille();
-
-            // Lecture de la grille depuis le fichier
-            for (int i = 0; i < lignes; i++) {
-                String ligne = reader.readLine();
-                for (int j = 0; j < colonnes; j++) {
-                    // Initialisation des cellules de la grille en fonction des caractères lus
-                    if (ligne.charAt(j) == 'O') {
-                        grille[i][j].setEnVie(true);
-                    } else {
-                        grille[i][j].setEnVie(false);
-                    }
-                }
-            }
-
-            // Fermeture du BufferedReader
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public HashMap<String, Integer> detecterMotifs(int tour) {
+    public void detecterMotifs(int tour) {
         List<Motif> listeMotifs = Motifs.getMotifs();
 
         HashMap<String, Integer> motifsDetectes = new HashMap<>();
 
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {
+
                 for (Motif motif : listeMotifs) {
-                    boolean trouve = true;
+                    boolean valide = true;
+                    
                     if (motif.getPeriodicite() != 0 && tour % motif.getPeriodicite() != 0)
-                        break;
+                        continue;
+                    
                     for (int[] coos : motif.getListeVivantes()) {
-                        if (!estDansGrille(i + coos[0], j + coos[1])) {
-                            trouve = false;
+                        int l = i + coos[0];
+                        int c = j + coos[1];
+
+                        if (!estDansGrille(l, c)) {
+                            valide = false;
                             break;
                         }
 
-                        // Vérifier que les cellules vivantes correspondent
-                        Cellule cellule = grille[i + coos[0]][j + coos[1]];
+                        Cellule celluleMotif = grille[l][c];
 
-                        if (!cellule.getEnVie()) {
-                            trouve = false;
+                        if (!celluleMotif.getEnVie()) {
+                            valide = false;
                             break;
                         }
 
-                        // Vérifier les voisins de la cellule vivantes du motif pour vérifier que c'est bien le motif et pas un autre
-                        for (Cellule voisin : cellule.getVoisins()) {
-                            if (voisin.getPosition().equals(coos) && !voisin.getEnVie()) {
-                                trouve = false;
+                        for (Cellule voisin : celluleMotif.getVoisins()) {
+                            if (voisin.equals(celluleMotif) && !voisin.getEnVie()) {
+                                valide = false;
                                 break;
                             }
                         }
                     }
-                    if (!trouve)
+                    if (!valide)
                         continue;
 
                     if (motifsDetectes.containsKey(motif.getNom()))
                         motifsDetectes.put(motif.getNom(), motifsDetectes.get(motif.getNom()) + 1);
                     else
                         motifsDetectes.put(motif.getNom(), 1);
+
+                    break;
                 }
             }
         }
-        return motifsDetectes;
+        
+        if (!motifsDetectes.isEmpty())
+            System.out.println("Motifs détectés :");
+            for (String name : motifsDetectes.keySet()) {
+                String value = motifsDetectes.get(name).toString();
+                System.out.println(name + " " + value);
+            }
     }
 
     // Méthode pour tester si la grille se répète
@@ -369,7 +307,7 @@ class Grille {
 
             if (egal) {
                 // Une répétition a été détectée
-                System.out.println("La grille se répète après " + (k + 1) + " itération(s). Il y a une périodicité de " + (grillesPrecedentes.size() - k - 2));
+                System.out.println("La grille se répète. Il y a une périodicité de " + (grillesPrecedentes.size() - k - 2));
                 return true;
             }
         }
@@ -377,7 +315,7 @@ class Grille {
     }
 
     // Méthode pour sauvegarder l'état actuel de la grille
-    public void sauvegarderGrille() {
+    public void sauvegarderEtat() {
         boolean[][] autreGrille = new boolean[lignes][colonnes];
 
         for (int i = 0; i < lignes; i++) {

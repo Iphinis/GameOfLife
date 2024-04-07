@@ -78,23 +78,24 @@ public class Motifs {
 
             if(rotation == 90) {
                 int tmp = coosBis[0];
-                coosBis[0] = coosBis[1];
+                coosBis[0] = -coosBis[1];
                 coosBis[1] = tmp;
             }
             else if(rotation == 180) {
                 coosBis[0] = -coosBis[0];
+                coosBis[1] = -coosBis[1];
             }
             else if(rotation == 270) {
                 int tmp = coosBis[0];
-                coosBis[0] = -coosBis[1];
-                coosBis[1] = tmp;
+                coosBis[0] = coosBis[1];
+                coosBis[1] = -tmp;
             }
 
             if(miroir == 1) {
-                coosBis[0] = -coosBis[0];
+                coosBis[1] = -coosBis[1];
             }
             else if(miroir == 2) {
-                coosBis[1] = -coosBis[1];
+                coosBis[0] = -coosBis[0];
             }
 
             vivantesBis.add(coosBis);
@@ -118,8 +119,7 @@ public class Motifs {
             for (int rotation = 0; rotation <= 270; rotation += 90) {
                 for (int miroir = 0; miroir <= 2; miroir++) {
                     Motif motif_alt = creerMotifAlternatif(motif, rotation, miroir);
-
-                    if(!listeMotifs.contains(motif_alt)) listeMotifs.add(motif_alt);
+                    if(!motif.equals(motif_alt) && !listeMotifs.contains(motif_alt)) listeMotifs.add(motif_alt);
                 }
             }
         }

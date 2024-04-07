@@ -147,21 +147,12 @@ class Cellule {
 		}
 	}
 
-	/*public boolean equals(Object o) {
+	public boolean equals(Object o) {
 		if (o == null || o.getClass() != this.getClass()) {
 			return false;
 		}
-
-		Cellule cellule = (Cellule) o;
-		return this.getEnVie() == cellule.getEnVie() && this.position[0] == cellule.position[0] && this.position[1] == cellule.position[1];
+	
+		Cellule autreC = (Cellule) o;
+		return this.enVie == autreC.getEnVie() && this.position[0] == autreC.getPosition()[0] && this.position[1] == autreC.getPosition()[1];
 	}
-
-	public int hashCode() {
-		if (getEnVie()) {
-			return 5;
-		} else {
-			return 3;
-		}
-	}*/
-
 }
