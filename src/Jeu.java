@@ -134,9 +134,13 @@ class Jeu {
             System.out.println("6. Changer le mode de jeu : actuel = " + modes[methodeEvolution]);
             System.out.println("7. Sauvegarder la grille");
             System.out.println("8. Quitter");
-            System.out.print("Choix : ");
+            System.out.print("Choix : \n");
+            
+            System.out.println("TEST POUR LES VOISINS\n");
             System.out.println(grille.grille[5][9].getEnVie());
 	    System.out.println(grille.grille[5][9].voisins.size());
+	    System.out.println(grille.grille[5][9].voisinsVivants());
+	    
             choix = scanner.nextInt();
             switch (choix) {
                 case 1:
