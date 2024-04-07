@@ -13,7 +13,7 @@ class Grille {
     public int lignes;
     private int periodiciteMax;
     public Cellule[][] grille;
-    private List<Cellule[][]> etatsPrecedents;
+    public List<Cellule[][]> etatsPrecedents;
 
     public Grille(int colonnes, int lignes, int periodiciteMax) {
         this.lignes = lignes;
@@ -248,19 +248,16 @@ class Grille {
 
     // Méthode pour vérifier si la grille se répète
 	public boolean grilleSeRepete() {
-    int periode = 0;
-    // Parcourir les états précédents pour détecter une répétition
-    for (int index = 0; index < etatsPrecedents.size(); index++) {
-        if (equalsGrille(etatsPrecedents.get(index))) {
-            // Calculer la périodicité
-            periode = etatsPrecedents.size() - index;
-            System.out.println("La grille se répète après " + index + " itération(s).");
-            System.out.println("Périodicité : " + periode);
-            return true;
-        }
-    }
-    return false;
-}
+		// Parcourir les états précédents pour détecter une répétition
+		for (int i = 0; i < etatsPrecedents.size() - 1; i++) { // Parcourir jusqu'à l'avant-dernier état
+		if (equalsGrille(etatsPrecedents.get(i))) {
+		    // Une répétition a été détectée
+		    System.out.println("La grille se répète après " + (i + 1) + " itération(s).");
+		    return true;
+		}
+		}
+		return false;
+	}
 
 
     // Méthode pour sauvegarder l'état actuel de la grille
@@ -278,31 +275,38 @@ class Grille {
     }
 
     public void sauvegarderGrille(String nomFichier) {
-        try {
-            // Création d'un FileWriter pour écrire dans le fichier spécifié
-            FileWriter fileWriter = new FileWriter(nomFichier, false);
+    try {
+        // Création d'un FileWriter pour écrire dans le fichier spécifié
+        FileWriter fileWriter = new FileWriter(nomFichier, false);
 
-            // Création d'un BufferedWriter qui utilise le FileWriter
-            BufferedWriter writer = new BufferedWriter(fileWriter);
+        // Création d'un BufferedWriter qui utilise le FileWriter
+        BufferedWriter writer = new BufferedWriter(fileWriter);
 
-            // Sauvegarde de la grille dans le fichier
-            writer.write(this.lignes);
-            writer.write(this.colonnes);
-            for (int i = 0; i < lignes; i++) {
-                for (int j = 0; j < colonnes; j++) {
-                    if (grille[i][j].getEnVie())
-                        writer.write("O");
-                    else
-                        writer.write("_");
+        // Sauvegarde du nombre de lignes et de colonnes dans le fichier
+        writer.write(String.valueOf(this.lignes));
+        writer.newLine();
+        writer.write(String.valueOf(this.colonnes));
+        writer.newLine();
+
+        // Sauvegarde de la grille dans le fichier
+        for (int i = 0; i < lignes; i++) {
+            for (int j = 0; j < colonnes; j++) {
+           
+                if (grille[i][j].getEnVie()) {
+                    writer.write("O");
+                } else {
+                    writer.write("_");
                 }
-                writer.newLine();
             }
-            // Fermeture du BufferedWriter
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+            writer.newLine();
         }
+        // Fermeture du BufferedWriter
+        writer.close();
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
+
 
     public void chargerGrille(String nomFichier) {
         try {
@@ -313,22 +317,22 @@ class Grille {
             BufferedReader reader = new BufferedReader(fileReader);
 
             // Lecture de la lignes et de la colonnes depuis le fichier
-            this.lignes = Integer.parseInt(reader.readLine());
-            this.colonnes = Integer.parseInt(reader.readLine());
+            lignes = Integer.parseInt(reader.readLine());
+            colonnes = Integer.parseInt(reader.readLine());
 
             // Initialisation de la grille avec les dimensions lues
-            this.grille = new Cellule[this.lignes][this.colonnes];
+            grille = new Cellule[this.lignes][this.colonnes];
 
             // Lecture de la grille depuis le fichier
             for (int i = 0; i < lignes; i++) {
                 String ligne = reader.readLine();
                 for (int j = 0; j < colonnes; j++) {
                     // Initialisation des grille en fonction des caractères lus
-                    this.grille[i][j] = new Cellule();
+                    grille[i][j] = new Cellule();
                     if (ligne.charAt(j) == 'O') {
-                        this.grille[i][j].setEnVie(true);
+                        grille[i][j].setEnVie(true);
                     } else {
-                        this.grille[i][j].setEnVie(false);
+                        grille[i][j].setEnVie(false);
                     }
                 }
                 etatsPrecedents.add(grille);
@@ -388,14 +392,14 @@ class Grille {
     }
     
     	public boolean equalsGrille(Cellule[][] grille1) {
-		for (int i = 0; i < this.lignes; i++) {
-            		for (int j = 0; j < this.colonnes; j++) {
-            			if (!this.grille[i][j].equals(grille1[i][j])) {
-    					return false;
-				}
-            		}
-            	}
-            	return true;
-	}
+   	 for (int i = 0; i < lignes; i++) {
+        for (int j = 0; j < colonnes; j++) {
+            if (!grille[i][j].equals(grille1[i][j])){
+                return false;
+            }
+        }
+   	 }
+    	return true;
+}	
 	
 }

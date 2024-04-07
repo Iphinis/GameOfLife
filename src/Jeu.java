@@ -161,7 +161,7 @@ class Jeu {
                     changerModeJeu();
                     break;
                 case 6:
-                    grille.sauvegarderGrille("data/grille/nouvelle_grille.txt");
+                    grille.sauvegarderGrille("data/grilles/nouvelle_grille.txt");
                     break;
                 case 7:
                     System.out.println("Au revoir !");
@@ -185,7 +185,7 @@ class Jeu {
     	grille.sauvegarderEtat();
     	while((valide) && (tour<n)){
     		
-    		
+    		System.out.println("nb etats enregistres = " + grille.etatsPrecedents.size());
 		System.out.println("Tour " + tour);
 		grille.evoluerGrille(methodeEvolution);
 		tour += 1;
@@ -219,52 +219,56 @@ class Jeu {
     
     
         private static void menuInitGrille() {
-    	int choix;
-    	boolean grilleInit=false;
-    	File repertoire = new File("/data/grilles");
-    	Scanner scanner = new Scanner(System.in);
-    	String nomFichier;
-    	
-    	do {
-            System.out.println("GOF BY SAAD X ROJAN:");
-            System.out.println("1. Nouvelle partie");
-            System.out.println("2. Charger une partie");
-            System.out.println("3. Quitter");
-                     
-            choix = scanner.nextInt();
-            scanner.nextLine(); 
+    int choix;
+    boolean grilleInit = false;
+    File repertoire = new File("data/grilles/");
 
-            switch (choix) {
-		case 1:
-			initialiserGrille();
-			grilleInit=true;
-			break;
-		case 2:
-			if (repertoire.isDirectory()) {
-				File[] fichiers = repertoire.listFiles();
-				if (fichiers != null && fichiers.length > 0) {
-					nomFichier = menuChoixFichier(fichiers);
-					grille.chargerGrille(nomFichier);
-					System.out.println("Grille chargee");
-					grilleInit = true;
-					} else {
-					System.out.println("Le répertoire est vide.");
-				}
-			} else {
-				System.out.println("Le chemin spécifié ne pointe pas vers un répertoire.");
-			}
-			break;
-		case 3:
-			System.out.println("Au revoir !");
-			break;
-		default:
-			System.out.println("Choix invalide. Veuillez choisir une option valide.");
-			break;
-	    }
+    Scanner scanner = new Scanner(System.in);
+    String nomFichier;
+    
+    do {
+        System.out.println("GOF BY SAAD X ROJAN:");
+        System.out.println("1. Nouvelle partie");
+        System.out.println("2. Charger une partie");
+        System.out.println("3. Quitter");
+                 
+        choix = scanner.nextInt();
+        scanner.nextLine(); 
 
-	} while((choix !=3) && (grilleInit==false));
-	//scanner.close();
-	}
+        switch (choix) {
+            case 1:
+                initialiserGrille();
+                grilleInit = true;
+                break;
+            case 2:
+                if (repertoire.isDirectory()) {
+                    File[] fichiers = repertoire.listFiles();
+                    if (fichiers != null && fichiers.length > 0) {
+                        nomFichier = menuChoixFichier(fichiers);
+                        System.out.println("OK TEST CHOIX NOM FICHIER");
+                        grille.chargerGrille("data/grilles/" + nomFichier);
+                        System.out.println("OK TEST CHARGEMENT GRILLE");
+                        System.out.println("Grille chargée");
+                        grilleInit = true;
+                    } else {
+                        System.out.println("Le répertoire est vide.");
+                    }
+                } else {
+                    System.out.println("Le chemin spécifié ne pointe pas vers un répertoire.");
+                }
+                break;
+            case 3:
+                System.out.println("Au revoir !");
+              	System.exit(0);
+                break;
+            default:
+                System.out.println("Choix invalide. Veuillez choisir une option valide.");
+                break;
+        }
+
+    } while ((choix != 3) && (grilleInit == false));
+}
+
 	
 	private static String menuChoixFichier(File[] fichiers) {
 	boolean fichierValide;
@@ -286,7 +290,6 @@ class Jeu {
                     break;
                 }
             }
-
             if (!fichierValide) {
                 System.out.println("Nom de fichier invalide. Veuillez choisir un fichier valide.");
             }
@@ -294,6 +297,7 @@ class Jeu {
        // scanner.close();
         return nomFichier;
     }
+    
     
     public static void main(String[] args) {
         menuInitGrille();
