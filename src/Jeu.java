@@ -241,6 +241,7 @@ class Jeu {
                 grilleInit = true;
                 break;
             case 2:
+                initialiserGrille();
                 if (repertoire.isDirectory()) {
                     File[] fichiers = repertoire.listFiles();
                     if (fichiers != null && fichiers.length > 0) {

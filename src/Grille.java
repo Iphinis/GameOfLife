@@ -265,6 +265,7 @@ class Grille {
         Cellule[][] copie = new Cellule[lignes][colonnes];
         for (int i = 0; i < lignes; i++) {
             for (int j = 0; j < colonnes; j++) {
+                copie[i][j] = new Cellule();
                 copie[i][j] = grille[i][j];
             }
         }
@@ -308,42 +309,41 @@ class Grille {
 }
 
 
-    public void chargerGrille(String nomFichier) {
-        try {
-            // Création d'un FileReader pour lire à partir du fichier spécifié
-            FileReader fileReader = new FileReader(nomFichier);
+ public void chargerGrille(String nomFichier) {
+    try {
+        // Création d'un FileReader pour lire à partir du fichier spécifié
+        FileReader fileReader = new FileReader(nomFichier);
 
-            // Création d'un BufferedReader qui utilise le FileReader
-            BufferedReader reader = new BufferedReader(fileReader);
+        // Création d'un BufferedReader qui utilise le FileReader
+        BufferedReader reader = new BufferedReader(fileReader);
 
-            // Lecture de la lignes et de la colonnes depuis le fichier
-            lignes = Integer.parseInt(reader.readLine());
-            colonnes = Integer.parseInt(reader.readLine());
+        // Lecture des lignes et des colonnes depuis le fichier
+        lignes = Integer.parseInt(reader.readLine());
+        colonnes = Integer.parseInt(reader.readLine());
 
-            // Initialisation de la grille avec les dimensions lues
-            grille = new Cellule[this.lignes][this.colonnes];
+        // Initialisation de la grille avec les dimensions lues
+        grille = new Cellule[lignes][colonnes];
 
-            // Lecture de la grille depuis le fichier
-            for (int i = 0; i < lignes; i++) {
-                String ligne = reader.readLine();
-                for (int j = 0; j < colonnes; j++) {
-                    // Initialisation des grille en fonction des caractères lus
-                    grille[i][j] = new Cellule();
-                    if (ligne.charAt(j) == 'O') {
-                        grille[i][j].setEnVie(true);
-                    } else {
-                        grille[i][j].setEnVie(false);
-                    }
+        // Lecture de la grille depuis le fichier
+        for (int i = 0; i < lignes; i++) {
+            String ligne = reader.readLine();
+            for (int j = 0; j < colonnes; j++) {
+                // Initialisation des cellules de la grille en fonction des caractères lus
+                grille[i][j] = new Cellule();
+                if (ligne.charAt(j) == 'O') {
+                    grille[i][j].setEnVie(true);
+                } else {
+                    grille[i][j].setEnVie(false);
                 }
-                etatsPrecedents.add(grille);
             }
-
-            // Fermeture du BufferedReader
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
+        // Fermeture du BufferedReader
+        reader.close();
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
 
     public HashMap<String, Integer> detecterMotifs(int tour) {
         List<Motif> listeMotifs = Motifs.getMotifs();
