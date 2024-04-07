@@ -6,7 +6,7 @@ class Cellule {
 	private boolean enVie;
 	private boolean prochainEtat;
 	private int[] position;
-	public List<Cellule> voisins;
+	private List<Cellule> voisins;
 
 	public Cellule() {
 		this.enVie = false;
@@ -63,7 +63,7 @@ class Cellule {
 
 	public void determinerProchainEtatClassique() {
 		int voisinsVivants = voisinsVivants();
-		if (getEnVie()) {
+		if (enVie) {
 			if (voisinsVivants < 2 || voisinsVivants > 3) {
 				setProchainEtat(false); // Mort par solitude ou surpopulation
 			} else {
@@ -78,7 +78,7 @@ class Cellule {
 
 	public void determinerProchainEtatHighlife() {
 		int voisinsVivants = voisinsVivants();
-		if (getEnVie()) {
+		if (enVie) {
 			if (voisinsVivants < 2 || voisinsVivants > 3) {
 				setProchainEtat(false);// Mort par solitude ou surpopulation
 			} else {
@@ -93,7 +93,7 @@ class Cellule {
 
 	public void determinerProchainEtatReplicator() {
 		int voisinsVivants = voisinsVivants();
-		if (getEnVie()) {
+		if (enVie) {
 			if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 7) {
 				setProchainEtat(true); // Survie
 			} else {
@@ -108,7 +108,7 @@ class Cellule {
 
 	public void determinerProchainEtatDayAndNight() {
 		int voisinsVivants = voisinsVivants();
-		if (getEnVie()) {
+		if (enVie) {
 			if (voisinsVivants == 3 || voisinsVivants == 4 || voisinsVivants == 6 || voisinsVivants == 7) {
 				setProchainEtat(true); // Survie
 			} else {
@@ -123,7 +123,7 @@ class Cellule {
 
 	public void determinerProchainEtatLifeWithoutDeath() {
 		int voisinsVivants = voisinsVivants();
-		if (voisinsVivants == 3 || getEnVie()) {
+		if (voisinsVivants == 3 || enVie) {
 			setProchainEtat(true);
 		} else {
 			setProchainEtat(false);
@@ -132,7 +132,7 @@ class Cellule {
 
 	public void determinerProchainEtatAmoeba() {
 		int voisinsVivants = voisinsVivants();
-		if (getEnVie()) {
+		if (enVie) {
 			if (voisinsVivants == 1 || voisinsVivants == 3 || voisinsVivants == 5 || voisinsVivants == 8
 					|| voisinsVivants == 9) {
 				setProchainEtat(true); // Survie
@@ -147,13 +147,13 @@ class Cellule {
 		}
 	}
 
-	public boolean equals(Object o) {
+	/*public boolean equals(Object o) {
 		if (o == null || o.getClass() != this.getClass()) {
 			return false;
 		}
 
 		Cellule cellule = (Cellule) o;
-		return cellule.getEnVie() == this.getEnVie();
+		return this.getEnVie() == cellule.getEnVie() && this.position[0] == cellule.position[0] && this.position[1] == cellule.position[1];
 	}
 
 	public int hashCode() {
@@ -162,6 +162,6 @@ class Cellule {
 		} else {
 			return 3;
 		}
-	}
+	}*/
 
 }

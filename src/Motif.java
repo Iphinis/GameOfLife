@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Motif {
     private String nom;
@@ -7,11 +8,17 @@ public class Motif {
 
     private List<int[]> listeVivantes = new ArrayList<>();
 
-    public Motif(String nom, int periodicite, List<int[]> listeVivantes) {
+    private int rotation;
+    private int miroir;
+
+    public Motif(String nom, int periodicite, List<int[]> listeVivantes, int rotation, int miroir) {
         this.nom = nom;
         this.periodicite = periodicite;
 
         this.listeVivantes = listeVivantes;
+
+        this.rotation = rotation;
+        this.miroir = miroir;
     }
 
     public String getNom() {
@@ -26,14 +33,47 @@ public class Motif {
         return listeVivantes;
     }
 
-    public void addListeVivantes(int[] coo) {
-        listeVivantes.add(coo);
+    public int getRotation() {
+        return rotation;
+    }
+
+    public int getMiroir() {
+        return miroir;
     }
 
     public void afficher() {
         for (int[] coos : listeVivantes) {
             System.out.println(coos[0] + "," + coos[1]);
         }
-        System.out.println("");
+    }
+
+    public boolean equals(Object o) {
+        if(o == null || o.getClass() != this.getClass()) return false;
+
+        Motif autreMotif = (Motif) o;
+
+        List<int[]> autreListeVivantes = autreMotif.getListeVivantes();
+        if(this.listeVivantes.size() != autreListeVivantes.size()) return false;
+
+        for (int[] coos : listeVivantes) {
+            boolean trouve = false;
+            for (int[] coos2 : autreListeVivantes) {
+                //if (Arrays.equals(Arrays.stream(coos).map(x -> Math.abs(x)).toArray(), Arrays.stream(coos2).map(x -> Math.abs(x)).toArray())) {
+                if (Arrays.equals(coos, coos2)) {
+                    trouve = true;
+                    break;
+                }
+            }
+            if (!trouve) {
+                //System.out.println("FAUX");
+                return false;
+            }
+        }
+        //System.out.println("VRAI");
+        return true;
+    }
+
+    public String toString() {
+        return this.getNom() + ((this.getRotation() != 0) ? " (rot: " + this.getRotation() + ")" : "") + ((this.getMiroir() != 0) ? " (mir: " + this.getMiroir() + ")" : "");
     }
 }

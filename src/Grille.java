@@ -12,19 +12,19 @@ class Grille {
     public int lignes;
     public int periodiciteMax;
     public Cellule[][] grille;
-    public List<Cellule[][]> etatsPrecedents;
+    public List<boolean[][]> grillesPrecedentes;
 
     public Grille(int colonnes, int lignes, int periodiciteMax) {
         this.lignes = lignes;
         this.colonnes = colonnes;
         this.periodiciteMax = periodiciteMax;
         this.grille = new Cellule[lignes][colonnes];
-        this.etatsPrecedents = new ArrayList<>();
+        this.grillesPrecedentes = new ArrayList<>();
         initialiserGrille();
     }
 
-    public boolean estDansGrille(int x, int y) {
-        return !(y < 0 || y >= lignes || x < 0 || x >= colonnes);
+    public boolean estDansGrille(int l, int c) {
+        return !(l < 0 || l >= lignes || c < 0 || c >= colonnes);
     }
 
     public void naitreCellule(int x, int y) throws IllegalArgumentException {
@@ -221,7 +221,7 @@ class Grille {
 
                 if (debug) {
                     // Pour debug le nombre de voisins des grille
-                    etat = Integer.toString(grille[i][j].voisinsVivants());
+                    etat = Integer.toString(grille[i][j].voisinsVivants());//Integer.toString(grille[i][j].getVoisins().size());
                 } else {
                     if (grille[i][j].getEnVie())
                         etat = "*";
@@ -236,34 +236,6 @@ class Grille {
         System.out.print(res);
 
         System.out.println(bordure + "\n");
-    }
-
-    // Méthode pour vérifier si la grille se répète
-    public boolean grilleSeRepete() {
-        // Parcourir les états précédents pour détecter une répétition
-        for (int i = 0; i < etatsPrecedents.size() - 1; i++) { // Parcourir jusqu'à l'avant-dernier état
-            if (equalsGrille(etatsPrecedents.get(i))) {
-                // Une répétition a été détectée
-                System.out.println("La grille se répète après " + (i + 1) + " itération(s).");
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Méthode pour sauvegarder l'état actuel de la grille
-    public void sauvegarderEtat() {
-        Cellule[][] copie = new Cellule[lignes][colonnes];
-        for (int i = 0; i < lignes; i++) {
-            for (int j = 0; j < colonnes; j++) {
-                copie[i][j] = new Cellule();
-                copie[i][j] = grille[i][j];
-            }
-        }
-        if (etatsPrecedents.size() == periodiciteMax) {
-            etatsPrecedents.remove(0);
-        }
-        etatsPrecedents.add(copie);
     }
 
     public void sauvegarderGrille(String nomFichier) {
@@ -310,16 +282,16 @@ class Grille {
             // Lecture des lignes et des colonnes depuis le fichier
             lignes = Integer.parseInt(reader.readLine());
             colonnes = Integer.parseInt(reader.readLine());
+            periodiciteMax = Motifs.getPeriodiciteMax();
 
             // Initialisation de la grille avec les dimensions lues
-            grille = new Cellule[lignes][colonnes];
+            initialiserGrille();
 
             // Lecture de la grille depuis le fichier
             for (int i = 0; i < lignes; i++) {
                 String ligne = reader.readLine();
                 for (int j = 0; j < colonnes; j++) {
                     // Initialisation des cellules de la grille en fonction des caractères lus
-                    grille[i][j] = new Cellule();
                     if (ligne.charAt(j) == 'O') {
                         grille[i][j].setEnVie(true);
                     } else {
@@ -344,7 +316,7 @@ class Grille {
             for (int j = 0; j < colonnes; j++) {
                 for (Motif motif : listeMotifs) {
                     boolean trouve = true;
-                    if (tour % motif.getPeriodicite() != 0)
+                    if (motif.getPeriodicite() != 0 && tour % motif.getPeriodicite() != 0)
                         break;
                     for (int[] coos : motif.getListeVivantes()) {
                         if (!estDansGrille(i + coos[0], j + coos[1])) {
@@ -360,8 +332,7 @@ class Grille {
                             break;
                         }
 
-                        // Vérifier les voisins de la cellule vivantes du motif pour vérifier que c'est
-                        // bien le motif et pas un autre
+                        // Vérifier les voisins de la cellule vivantes du motif pour vérifier que c'est bien le motif et pas un autre
                         for (Cellule voisin : cellule.getVoisins()) {
                             if (voisin.getPosition().equals(coos) && !voisin.getEnVie()) {
                                 trouve = false;
@@ -382,15 +353,44 @@ class Grille {
         return motifsDetectes;
     }
 
-    public boolean equalsGrille(Cellule[][] grille1) {
-        for (int i = 0; i < lignes; i++) {
-            for (int j = 0; j < colonnes; j++) {
-                if (!grille[i][j].equals(grille1[i][j])) {
-                    return false;
+    // Méthode pour tester si la grille se répète
+    public boolean grilleSeRepete() {
+        // Parcourir les états précédents pour détecter une répétition
+        for(int k=0; k < grillesPrecedentes.size() - 1; k++) {
+            boolean egal = true;
+            for (int i = 0; i < lignes; i++) {
+                for (int j = 0; j < colonnes; j++) {
+                    if(grille[i][j].getEnVie() != grillesPrecedentes.get(k)[i][j]) {
+                        egal = false;
+                        break;
+                    }
                 }
             }
+
+            if (egal) {
+                // Une répétition a été détectée
+                System.out.println("La grille se répète après " + (k + 1) + " itération(s). Il y a une périodicité de " + (grillesPrecedentes.size() - k - 2));
+                return true;
+            }
         }
-        return true;
+        return false;
+    }
+
+    // Méthode pour sauvegarder l'état actuel de la grille
+    public void sauvegarderGrille() {
+        boolean[][] autreGrille = new boolean[lignes][colonnes];
+
+        for (int i = 0; i < lignes; i++) {
+            for (int j = 0; j < colonnes; j++) {
+                autreGrille[i][j] = grille[i][j].getEnVie();
+            }
+        }
+
+        if (grillesPrecedentes.size() == periodiciteMax) {
+            grillesPrecedentes.remove(0);
+        }
+
+        grillesPrecedentes.add(autreGrille);
     }
 
 }

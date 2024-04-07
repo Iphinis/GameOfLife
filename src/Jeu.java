@@ -7,7 +7,7 @@ class Jeu {
     static Grille grille;
     static int lignes = 10;
     static int colonnes = 20;
-    static int tour = 0;
+    static int tour = 1;
     static int methodeEvolution = 0;
     static List<Motif> motifs;
 
@@ -22,7 +22,7 @@ class Jeu {
 
     static ModeJeu[] modes = ModeJeu.values();
 
-    private static void initialiserGrille() {
+    private static void initialiserMotifs() {
         // Initialiser les motifs
         try {
             Motifs.initialiserMotifs("data/motifs/");
@@ -30,7 +30,9 @@ class Jeu {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private static void initialiserGrille() {
         // Initialiser la grille
         grille = new Grille(colonnes, lignes, Motifs.getPeriodiciteMax());
     }
@@ -57,11 +59,16 @@ class Jeu {
     }
 
     private static void naitreMotif(Scanner scanner) {
+        if(motifs == null || motifs.size() == 0) {
+            System.out.println("Aucun motif disponible");
+            return;
+        }
         int nb, x, y;
 
         System.out.println("Motifs disponibles :");
         for (int i=0; i < motifs.size(); i++) {
-            System.out.println(i + ". " + motifs.get(i).getNom());
+            Motif motif = motifs.get(i);
+            System.out.println(i + ". " + motif);
         }
         System.out.println("Quel motif voulez vous faire naître ?");
         do {
@@ -71,10 +78,8 @@ class Jeu {
         do {
             System.out.print("Saisir x entre 0 et " + (colonnes - 1) + " : ");
             x = scanner.nextInt();
-            scanner.nextLine();
             System.out.print("Saisir y entre 0 et " + (lignes - 1) + " : ");
             y = scanner.nextInt();
-            scanner.nextLine();
         } while (!grille.estDansGrille(x, y));
 
         grille.insererMotif(motifs.get(nb),new int[]{x,y});
@@ -120,6 +125,39 @@ class Jeu {
         methodeEvolution = choix-1;
     }
 
+    private static void avancerTour(int n) {
+        grille.sauvegarderGrille();
+        
+        for (int t = 1; t <= n; t++, tour++) {
+            System.out.println("Tour " + tour);
+
+            grille.evoluerGrille(methodeEvolution);
+            grille.afficher();
+            grille.sauvegarderGrille();
+
+            HashMap<String, Integer> motifsDetectes = grille.detecterMotifs(tour);
+            if (!motifsDetectes.isEmpty())
+                System.out.println("Motifs détectés :");
+            for (String name : motifsDetectes.keySet()) {
+                String value = motifsDetectes.get(name).toString();
+                System.out.println(name + " " + value);
+            }
+            
+            // Vérifier si la grille est vide
+            if (grille.estGrilleVide()) {
+                System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.\n");
+                break;
+            }
+
+            // Vérifier si la grille se répète
+            if (grille.grilleSeRepete()) {
+                System.out.println("Le jeu s'arrête car la grille se répète.\n");
+                break;
+            }
+            System.out.println();
+        }
+    }
+
     private static void menuTour(Scanner scanner) {
         int choix;
         do {
@@ -135,38 +173,23 @@ class Jeu {
             System.out.println("7. Sauvegarder la grille");
             System.out.println("8. Quitter");
             System.out.print("Choix : \n");
-            
-            System.out.println("TEST POUR LES VOISINS\n");
-            System.out.println(grille.grille[5][9].getEnVie());
-	    System.out.println(grille.grille[5][9].voisins.size());
-	    System.out.println(grille.grille[5][9].voisinsVivants());
-	    
+
             choix = scanner.nextInt();
             switch (choix) {
                 case 1:
                     initialiserGrille();
-                    System.out.print("OK REINITIASALITION GRILLE\n");
-                    System.out.print("COLONNES = " + grille.colonnes + "\n");
-                    System.out.print("LIGNES = " + grille.lignes + "\n");
-                    System.out.print("PERIODMAX = " + grille.periodiciteMax + "\n");
                     break;
                 case 2:
-                    // System.out.print("x = " + grille.colonnes);
-                    // System.out.print("y = " + grille.lignes);
-                    // System.out.print("OK COORDONNEES X Y\n");
                     naitreCellules(scanner);
-                    System.out.print("OK NAISSANCE CELLULES\n");
                     break;
                 case 3:
                     naitreMotif(scanner);
-                    System.out.print("OK NAISSANCE MOTIF\n");
                     break;
                 case 4:
                     tuerCellules(scanner);
-                    System.out.print("OK TUER CELLULES\n");
                     break;
                 case 5:
-                    System.out.print("Entrez le nombre d'iterations a effectuer : ");
+                    System.out.print("Entrez le nombre d'iterations à effectuer : ");
                     int nbTours;
                     if (scanner.hasNextInt()) {
                         nbTours = scanner.nextInt();
@@ -193,48 +216,33 @@ class Jeu {
         scanner.close(); // Fermer le scanner après avoir terminé la boucle
     }
 
-    // Methode statique pour avancer d'un tour dans le jeu
-    private static void avancerTour(int n) {
-        int tour = 0;
-        boolean valide = true;
-        grille.sauvegarderEtat();
-        
-        while ((valide) && (tour < n)) {
-	    tour += 1;
-            System.out.println("nb etats enregistres = " + grille.etatsPrecedents.size());
-            System.out.println("Tour " + tour);
-            grille.evoluerGrille(methodeEvolution);
-            
+    private static String menuChoixFichier(Scanner scanner, File[] fichiers) {
+        boolean fichierValide;
+        String nomFichier;
 
-            grille.afficher();
-
-            HashMap<String, Integer> motifsDetectes = grille.detecterMotifs(tour);
-            if (!motifsDetectes.isEmpty())
-                System.out.println("Motifs détectés :");
-            for (String name : motifsDetectes.keySet()) {
-                String value = motifsDetectes.get(name).toString();
-                System.out.println(name + " " + value);
-            }
-            
-            // Vérifier si la grille est vide
-            if (grille.estGrilleVide()) {
-                System.out.println("Toutes les cellules sont mortes. Arrêt du jeu.\n");
-                valide = false;
-            }
-
-            // Vérifier si la grille se répète
-            if ((tour > 2) && (grille.grilleSeRepete())) {
-                System.out.println("Le jeu s'arrête car la grille se répète.\n");
-                valide = false;
-            }
-
-            System.out.println();
-            grille.sauvegarderEtat();
-
+        System.out.println("Liste des fichiers dans le répertoire :");
+        for (File fichier : fichiers) {
+            System.out.println("- " + fichier.getName());
         }
+        do {
+            System.out.println("Veuillez choisir le nom du fichier à charger : ");
+            nomFichier = scanner.nextLine();
+            fichierValide = false;
+
+            for (File fichier : fichiers) {
+                if (fichier.getName().equals(nomFichier)) {
+                    fichierValide = true;
+                    break;
+                }
+            }
+            if (!fichierValide) {
+                System.out.println("Nom de fichier invalide. Veuillez choisir un fichier valide.");
+            }
+        } while (!fichierValide);
+        return nomFichier;
     }
 
-    private static void menuInitGrille(Scanner scanner) {
+    private static void menuGrille(Scanner scanner) {
         int choix;
         boolean grilleInit = false;
         File repertoire = new File("data/grilles/");
@@ -242,7 +250,7 @@ class Jeu {
         String nomFichier;
 
         do {
-            System.out.println("GOF BY SAAD X ROJAN:");
+            System.out.println("GAME OF LIFE BY SAAD X ROJAN:");
             System.out.println("1. Nouvelle partie");
             System.out.println("2. Charger une partie");
             System.out.println("3. Quitter");
@@ -253,10 +261,6 @@ class Jeu {
             switch (choix) {
                 case 1:
                     initialiserGrille();
-                    System.out.print("OK INITIASALITION GRILLE\n");
-                    System.out.print("COLONNES = " + grille.colonnes + "\n");
-                    System.out.print("LIGNES = " + grille.lignes + "\n");
-                    System.out.print("PERIODMAX = " + grille.periodiciteMax + "\n");
                     grilleInit = true;
                     break;
                 case 2:
@@ -267,10 +271,6 @@ class Jeu {
                             nomFichier = menuChoixFichier(scanner, fichiers);
                             //System.out.println("OK TEST CHOIX NOM FICHIER");
                             grille.chargerGrille("data/grilles/" + nomFichier);
-                            System.out.print("OK CHARGEMENT GRILLE\n");
-                    System.out.print("COLONNES = " + grille.colonnes + "\n");
-                    System.out.print("LIGNES = " + grille.lignes + "\n");
-                    System.out.print("PERIODMAX = " + grille.periodiciteMax + "\n");
                             grilleInit = true;
                         } else {
                             System.out.println("Le répertoire est vide.");
@@ -291,35 +291,11 @@ class Jeu {
         } while ((choix != 3) && (grilleInit == false));
     }
 
-    private static String menuChoixFichier(Scanner scanner, File[] fichiers) {
-        boolean fichierValide;
-        String nomFichier;
-
-        System.out.println("Liste des fichiers dans le répertoire :");
-        for (File fichier : fichiers) {
-            System.out.println(fichier.getName());
-        }
-        do {
-            System.out.println("Veuillez choisir le nom du fichier à charger : ");
-            nomFichier = scanner.nextLine();
-            fichierValide = false;
-
-            for (File fichier : fichiers) {
-                if (fichier.getName().equals(nomFichier)) {
-                    fichierValide = true;
-                    break;
-                }
-            }
-            if (!fichierValide) {
-                System.out.println("Nom de fichier invalide. Veuillez choisir un fichier valide.");
-            }
-        } while (!fichierValide);
-        return nomFichier;
-    }
-
     public static void main(String[] args) {
+        initialiserMotifs();
+        
         Scanner scanner = new Scanner(System.in);
-        menuInitGrille(scanner);
+        menuGrille(scanner);
         menuTour(scanner);
         scanner.close();
     }

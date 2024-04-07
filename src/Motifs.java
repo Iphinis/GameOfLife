@@ -52,7 +52,7 @@ public class Motifs {
 			e.printStackTrace();
 		}
 
-        return new Motif(nom, periodicite, vivantes);
+        return new Motif(nom, periodicite, vivantes, 0, 0);
     }
 
     // Pour créer un motif alternatif à l'original
@@ -100,7 +100,7 @@ public class Motifs {
             vivantesBis.add(coosBis);
         }
 
-        return new Motif(motif.getNom(), motif.getPeriodicite(), vivantesBis);
+        return new Motif(motif.getNom(), motif.getPeriodicite(), vivantesBis, rotation, miroir);
     }
 
     public static void initialiserMotifs(String cheminDossier) throws Exception {
@@ -112,34 +112,24 @@ public class Motifs {
             String nomMotif = file.getName().substring(0, file.getName().lastIndexOf("."));
 
             Motif motif = creerMotif(nomMotif, cheminDossier+file.getName());
-
-            Motif motif_alt = creerMotifAlternatif(motif, 90, 0);
-
-            //motif.afficher();
-            //motif_alt.afficher();
-
-            // TODO: indiquer dans le fichier du motif les rotations et miroirs à faire
             listeMotifs.add(motif);
-            listeMotifs.add(motif_alt);
 
-            /*getCoosAlternatives(motif, 90, 0);
-            listeMotifs.add(getMotifAlternatif(motif, 180, 0));
-            listeMotifs.add(getMotifAlternatif(motif, 270, 0));
+            // Création des motifs alternatifs (sans doublon)
+            for (int rotation = 0; rotation <= 270; rotation += 90) {
+                for (int miroir = 0; miroir <= 2; miroir++) {
+                    Motif motif_alt = creerMotifAlternatif(motif, rotation, miroir);
 
-            listeMotifs.add(getMotifAlternatif(motif, 0, 1));
-            listeMotifs.add(getMotifAlternatif(motif, 90, 1));
-            listeMotifs.add(getMotifAlternatif(motif, 180, 1));
-
-            listeMotifs.add(getMotifAlternatif(motif, 0, 2));
-            listeMotifs.add(getMotifAlternatif(motif, 90, 2));
-            listeMotifs.add(getMotifAlternatif(motif, 180, 2));*/
+                    if(!listeMotifs.contains(motif_alt)) listeMotifs.add(motif_alt);
+                }
+            }
         }
     }
 
     public static int getPeriodiciteMax() {
-        return listeMotifs.stream()
+        int maxMotifs = listeMotifs.stream()
             .mapToInt(motif -> motif.getListeVivantes().size())
             .max()
             .orElse(20);
+        return Math.max(maxMotifs, 20);
     }
 }
